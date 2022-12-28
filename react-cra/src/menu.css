@@ -1,0 +1,15 @@
+.World-map-auto {
+  width: auto;
+}
+.World-map-full {
+  width: 100%;
+}
+.World-map-60 {
+  width: 60%;
+}
+.World-map-1000 {
+  width: 1000px;
+}
+.World-map-height-full {
+  height: 40%;
+}
