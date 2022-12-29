@@ -1,3 +1,7 @@
+.container {
+  position: relative;
+  width: 100%;
+}
 .World-map-auto {
   width: auto;
 }
@@ -12,4 +16,109 @@
 }
 .World-map-height-full {
   height: 40%;
+}
+.mining-span {
+  position: absolute;
+  width: 2.3%;
+  height: 5.5%;
+  left: 49.5%;
+  top: 0.4%;
+}
+.sleeping-span {
+  position: absolute;
+  width: 4.4%;
+  height: 8%;
+  left: 56.4%;
+  top: 18.1%;
+}
+.shop-span {
+  position: absolute;
+  width: 4%;
+  height: 8.6%;
+  left: 53.1%;
+  top: 40.1%;
+}
+.smith-span {
+  position: absolute;
+  width: 4.5%;
+  height: 7.7%;
+  left: 41.9%;
+  top: 41.18%;
+}
+.explore-span {
+  position: absolute;
+  width: 2.45%;
+  height: 5.35%;
+  left: 32%;
+  top: 92.7%;
+}
+.woodchuck-span {
+  position: absolute;
+  width: 2.45%;
+  height: 5.35%;
+  left: 42.64%;
+  top: 92.7%;
+}
+.fight-span {
+  position: absolute;
+  width: 2.45%;
+  height: 5.35%;
+  left: 62.9%;
+  top: 92.7%;
+}
+.tooltipTop {
+  position: relative;
+  height: 100%;
+  /* display: inline-block; */
+  border: 2px dotted green;
+}
+.tooltipTop .tooltipTextTop {
+  visibility: hidden;
+  width: 200px;
+  background-color: burlywood;
+  color: #fff;
+  text-align: center;
+  border: 2px;
+  border-style: solid;
+  border-color: #000;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1080;
+  top: 100%;
+  /* left: 60%; */
+  margin-left: -100px;
+}
+.tooltipTop:hover .tooltipTextTop {
+  visibility: visible;
+}
+.tooltipBottom {
+  position: relative;
+  height: 100%;
+  /* display: inline-block; */
+  border: 2px dotted green;
+}
+.tooltipBottom .tooltipTextBottom {
+  visibility: hidden;
+  width: 200px;
+  background-color: burlywood;
+  color: #fff;
+  text-align: center;
+  border: 2px;
+  border-style: solid;
+  border-color: #000;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1080;
+  bottom: 100%;
+  left: 10%;
+  margin-left: -85px;
+}
+.tooltipBottom:hover .tooltipTextBottom {
+  visibility: visible;
 }
