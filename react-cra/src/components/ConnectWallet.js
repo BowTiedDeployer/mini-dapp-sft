@@ -1,6 +1,7 @@
 import React from "react";
 import { AppConfig, showConnect, UserSession } from "@stacks/connect";
 import { MainMenu } from "./MainMenu";
+import { network } from "../constants/network";
 
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 
@@ -21,18 +22,9 @@ function authenticate() {
 }
 
 const ConnectWallet = () => {
-  console.log(userSession.isUserSignedIn());
   if (userSession.isUserSignedIn()) {
-    return (
-      <div>
-        {/* <button className="Connect" onClick={disconnect}>
-          Disconnect Wallet
-        </button> */}
-        <MainMenu></MainMenu>
-        {/* <p>mainnet: {userSession.loadUserData().profile.stxAddress.mainnet}</p>
-        <p>testnet: {userSession.loadUserData().profile.stxAddress.testnet}</p> */}
-      </div>
-    );
+    console.log(userSession.loadUserData().profile.stxAddress.mocknet);
+    return <MainMenu />;
   }
 
   return (

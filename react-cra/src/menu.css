@@ -1,4 +1,26 @@
-.container {
+.fullscreen-div {
+  width: 100%;
+}
+.left-div {
+  width: 50%;
+  height: 80%;
+  position: absolute;
+  top: 10%;
+  left: 0%;
+}
+.bottom-absolute {
+  position: absolute;
+  bottom: 0%;
+  left: 45%;
+}
+.right-div {
+  width: 50%;
+  height: 80%;
+  position: absolute;
+  top: 10%;
+  right: 0%;
+}
+.container-div {
   position: relative;
   width: 100%;
 }

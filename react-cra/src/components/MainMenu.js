@@ -1,13 +1,35 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { AppConfig, UserSession } from "@stacks/connect";
 import mainMenuMap from "../resources/world-map.png";
-//import mainMenuMap from "../resources/test.jpeg";
 import "../menu.css";
 import NavBar from "./NavBar";
 import { NewScene } from "./NewScene";
+import {
+  fetchReadOnlySimple,
+  fetchReadOnlyMining,
+} from "../utils/fetchReadOnly";
+import { fightingList, sleepingList } from "../constants/dataLists";
+import { dataFunctionNames } from "../constants/dataFunctionNames";
+import {
+  fetchHarvestingOperationData,
+  fetchMainOperationData,
+  fetchMiningOperationData,
+} from "../utils/dataFetchingFuntions";
 
 export const MainMenu = () => {
-  const [menuPage, setMenuPage] = useState("MainMenu");
+  const [menuPage, setMenuPage] = useState("Loading");
+  const [mainDataDictionary, setMainDataDictionary] = useState({});
+  const [hasRespondedData, setHasRespondedData] = useState(false);
+  const [operationData, setOperationData] = useState({
+    attributes: {},
+    crafting: {},
+    "level-up": {},
+    acquisition: {},
+    sleeping: {},
+    fighting: {},
+    mining: {},
+    harvesting: {},
+  });
   const miningFunction = () => {
     alert("mining");
   };
@@ -29,11 +51,51 @@ export const MainMenu = () => {
   const fightFunction = () => {
     setMenuPage("Fight");
   };
+
+  const fetchMainDictionary = useCallback(async () => {
+    let mainDataDictionaryLocal = {};
+
+    mainDataDictionaryLocal["fighting-resources"] =
+      await fetchMainOperationData("fighting-resources");
+
+    mainDataDictionaryLocal["fighting-rewards"] = await fetchMainOperationData(
+      "fighting-rewards"
+    );
+
+    mainDataDictionaryLocal["level-up"] = await fetchMainOperationData(
+      "level-up"
+    );
+
+    mainDataDictionaryLocal["crafting"] = await fetchMainOperationData(
+      "crafting"
+    );
+
+    mainDataDictionaryLocal["acquisition"] = await fetchMainOperationData(
+      "acquisition"
+    );
+
+    mainDataDictionaryLocal["mining"] = await fetchMiningOperationData(
+      "mining"
+    );
+
+    mainDataDictionaryLocal["harvesting"] = await fetchHarvestingOperationData(
+      "harvesting"
+    );
+    setMainDataDictionary(mainDataDictionaryLocal);
+    console.log(await mainDataDictionaryLocal);
+    setMenuPage("MainMenu");
+  }, [setMainDataDictionary]);
+
+  useEffect(() => {
+    fetchMainDictionary();
+  }, [hasRespondedData]);
+
   const menuPageMapping = {
+    Loading: <div>Loading...</div>,
     MainMenu: (
-      <div className="container">
+      <div className="fullscreen-div">
         <NavBar />
-        <div className="container">
+        <div className="container-div">
           <img
             className="World-map-full"
             src={mainMenuMap}
@@ -80,10 +142,34 @@ export const MainMenu = () => {
         </div>
       </div>
     ),
-    Smith: <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />,
-    Shop: <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />,
-    Inventory: <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />,
-    Fight: <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />,
+    Smith: (
+      <div className="fullscreen-div">
+        <NavBar />
+        <NewScene
+          menuPage={menuPage}
+          setMenuPage={setMenuPage}
+          mainDataDictionary={mainDataDictionary}
+        />
+      </div>
+    ),
+    Shop: (
+      <div className="fullscreen-div">
+        <NavBar />
+        <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />
+      </div>
+    ),
+    Inventory: (
+      <div className="fullscreen-div">
+        <NavBar />
+        <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />
+      </div>
+    ),
+    Fight: (
+      <div className="fullscreen-div">
+        <NavBar />
+        <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />
+      </div>
+    ),
   };
 
   return menuPageMapping[menuPage];
