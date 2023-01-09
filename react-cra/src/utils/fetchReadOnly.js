@@ -28,6 +28,7 @@ export const fetchReadOnlySimple = async (requestUrl, requestList) => {
       arguments: [cvToHex(listCV(convertedList))],
     }),
   };
+  // debugger;
   let returnedData = await fetch(requestUrl, requestOptions)
     .then((response) => response.json())
     .then((data) => cvToJSON(hexToCV(data.result)));

@@ -6,6 +6,7 @@ import NavBar from "./NavBar";
 import { NewScene } from "./NewScene";
 import {
   fetchMainOperationData,
+  fetchTokenNameData,
   fetchTupleOperationData,
 } from "../utils/dataFetchingFuntions";
 import { PopupScene } from "./PopupScene";
@@ -95,8 +96,11 @@ export const MainMenu = () => {
     mainDataDictionaryLocal["harvesting"] = await fetchTupleOperationData(
       "harvesting"
     );
+
+    mainDataDictionaryLocal["token-name"] = await fetchTokenNameData(
+      "tokenName"
+    );
     setMainDataDictionary(mainDataDictionaryLocal);
-    console.log(await mainDataDictionaryLocal);
     setMenuPage("MainMenu");
   }, [setMainDataDictionary]);
 

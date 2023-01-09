@@ -3,6 +3,7 @@ import {
   craftingList,
   fightingList,
   harvestingList,
+  itemsList,
   levelUpList,
   miningList,
   sleepingList,
@@ -58,5 +59,11 @@ export const dataFunctionNames = {
     key1: "harvesting-item",
     value: "harvesting-rewards-data",
     list: harvestingList,
+  },
+  tokenName: {
+    functionName: "get-all-token-name-data",
+    key: "id",
+    value: "token-name-data",
+    list: itemsList,
   },
 };

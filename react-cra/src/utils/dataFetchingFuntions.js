@@ -10,7 +10,8 @@ export const fetchMainOperationData = async (operation) => {
   let operationDictionaryLocal = {};
   let mainOperationsDataLocal = "";
   let startingIndex = 0;
-  let finalIndex = 5;
+  let total = 5;
+  let finalIndex = total;
   let operationList = dataFunctionNames[operation].list;
 
   while (startingIndex < operationList.length) {
@@ -18,32 +19,30 @@ export const fetchMainOperationData = async (operation) => {
       `http://localhost:3999/v2/contracts/call-read/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/main-sc/${dataFunctionNames[operation].functionName}`,
       operationList.slice(startingIndex, finalIndex)
     );
-    startingIndex += finalIndex;
-    finalIndex += finalIndex;
+    startingIndex += total;
+    finalIndex += total;
 
     if (mainOperationsDataLocal != "") {
       // for every returned value, keep number of resources sets (resource-id, resource-qty)
 
       mainOperationsDataLocal.value.forEach((element) => {
+        // key - token id
+
+        let dictionaryKey =
+          element.value[dataFunctionNames[operation].key].value;
         let i = 1;
 
         // keep only what is necessarry
 
         element.value[dataFunctionNames[operation].value].value.forEach(
           (resourcePair) => {
-            if (
-              operationDictionaryLocal[
-                element.value[dataFunctionNames[operation].key].value
-              ]
-            )
-              operationDictionaryLocal[
-                element.value[dataFunctionNames[operation].key].value
-              ][i] = resourcePair.value;
+            let dictValue = resourcePair.value;
+
+            if (operationDictionaryLocal[dictionaryKey])
+              operationDictionaryLocal[dictionaryKey][i] = dictValue;
             else
-              operationDictionaryLocal[
-                element.value[dataFunctionNames[operation].key].value
-              ] = {
-                [i]: resourcePair.value,
+              operationDictionaryLocal[dictionaryKey] = {
+                [i]: dictValue,
               };
             i++;
           }
@@ -60,23 +59,23 @@ export const fetchTupleOperationData = async (operation) => {
   let rewardsDataLocal = "";
   let startingIndex = 0;
   let total = 5;
+  let finalIndex = total;
   let operationList = dataFunctionNames[operation].list;
 
   while (startingIndex < operationList.length) {
     if (operation == "mining")
       rewardsDataLocal = await fetchReadOnlyMining(
         `http://localhost:3999/v2/contracts/call-read/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/main-sc/${dataFunctionNames[operation].functionName}`,
-        operationList.slice(startingIndex, total)
+        operationList.slice(startingIndex, finalIndex)
         /// to check if can put conditional here and get rid of the second function
       );
     else if (operation == "harvesting")
       rewardsDataLocal = await fetchReadOnlyHarvesting(
         `http://localhost:3999/v2/contracts/call-read/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/main-sc/${dataFunctionNames[operation].functionName}`,
-        operationList.slice(startingIndex, total)
+        operationList.slice(startingIndex, finalIndex)
       );
     startingIndex += total;
-    total += total;
-    console.log(rewardsDataLocal);
+    finalIndex += total;
 
     if (rewardsDataLocal != "") {
       // for every returned value, keep number of resources sets (resource-id, resource-qty)
@@ -128,4 +127,56 @@ export const fetchTupleOperationData = async (operation) => {
     }
   }
   return operationDictionaryLocal;
+};
+
+export const fetchTokenNameData = async (operation) => {
+  /// e.g. operation = fighting-resources
+  let tokenNameDictionaryLocal = {};
+  let tokenNameDataLocal = "";
+  let startingIndex = 0;
+  let total = 3;
+  let finalIndex = total;
+  let operationList = dataFunctionNames[operation].list;
+
+  while (startingIndex < operationList.length) {
+    tokenNameDataLocal = await fetchReadOnlySimple(
+      `http://localhost:3999/v2/contracts/call-read/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/main-sc/${dataFunctionNames[operation].functionName}`,
+      operationList.slice(startingIndex, finalIndex)
+    );
+    startingIndex += total;
+    finalIndex += total;
+
+    if (tokenNameDataLocal != "") {
+      // for every returned value, keep number of resources sets (resource-id, resource-qty)
+
+      tokenNameDataLocal.value.forEach((element) => {
+        let dictionaryKey =
+          element.value[dataFunctionNames[operation].key].value;
+        let i = 1;
+        // keep only what is necessarry
+
+        tokenNameDictionaryLocal = {
+          ...tokenNameDictionaryLocal,
+          [dictionaryKey]: {
+            name: element.value[dataFunctionNames[operation].value].value.value
+              .name.value,
+            type: element.value[dataFunctionNames[operation].value].value.value
+              .type.value,
+            values: {
+              defense:
+                element.value[dataFunctionNames[operation].value].value.value
+                  .values.value.defense.value,
+              damage:
+                element.value[dataFunctionNames[operation].value].value.value
+                  .values.value.dmg.value,
+              health:
+                element.value[dataFunctionNames[operation].value].value.value
+                  .values.value.health.value,
+            },
+          },
+        };
+      });
+    }
+  }
+  return tokenNameDictionaryLocal;
 };
