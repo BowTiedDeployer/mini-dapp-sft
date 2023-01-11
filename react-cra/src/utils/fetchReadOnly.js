@@ -11,6 +11,7 @@ import { userSession } from "../components/ConnectWallet";
 import { network } from "../constants/network";
 import { listCV, intCV } from "@stacks/transactions";
 import { intToHexString } from "./convert";
+import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 
 export const fetchReadOnlySimple = async (requestUrl, requestList) => {
   let convertedList = [];
@@ -28,7 +29,35 @@ export const fetchReadOnlySimple = async (requestUrl, requestList) => {
       arguments: [cvToHex(listCV(convertedList))],
     }),
   };
-  // debugger;
+  let returnedData = await fetch(requestUrl, requestOptions)
+    .then((response) => response.json())
+    .then((data) => cvToJSON(hexToCV(data.result)));
+  return await returnedData;
+};
+
+export const fetchReadOnlyBalances = async (
+  requestUrl,
+  requestList,
+  userAddress
+) => {
+  let convertedList = [];
+  requestList.forEach((element) => {
+    convertedList.push(uintCV(element));
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sender: "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4",
+      //userSession.loadUserData().profile.stxAddress.devnet, // todo: check this
+      network: network,
+      arguments: [
+        cvToHex(principalCV(userAddress)),
+        cvToHex(listCV(convertedList)),
+      ],
+    }),
+  };
   let returnedData = await fetch(requestUrl, requestOptions)
     .then((response) => response.json())
     .then((data) => cvToJSON(hexToCV(data.result)));

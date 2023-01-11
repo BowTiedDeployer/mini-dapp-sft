@@ -23,7 +23,8 @@ function authenticate() {
 
 const ConnectWallet = () => {
   if (userSession.isUserSignedIn()) {
-    console.log(userSession.loadUserData().profile.stxAddress.mocknet);
+    console.log(userSession.loadUserData().profile.stxAddress["mocknet"]);
+    console.log(userSession.loadUserData().profile.stxAddress.testnet);
     return <MainMenu />;
   }
 

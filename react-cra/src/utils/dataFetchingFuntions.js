@@ -3,6 +3,7 @@ import {
   fetchReadOnlySimple,
   fetchReadOnlyMining,
   fetchReadOnlyHarvesting,
+  fetchReadOnlyBalances,
 } from "./fetchReadOnly";
 
 export const fetchMainOperationData = async (operation) => {
@@ -10,7 +11,7 @@ export const fetchMainOperationData = async (operation) => {
   let operationDictionaryLocal = {};
   let mainOperationsDataLocal = "";
   let startingIndex = 0;
-  let total = 5;
+  let total = 7;
   let finalIndex = total;
   let operationList = dataFunctionNames[operation].list;
 
@@ -53,12 +54,56 @@ export const fetchMainOperationData = async (operation) => {
   return operationDictionaryLocal;
 };
 
+export const fetchBalancesData = async (operation, userAddress) => {
+  /// e.g. operation = fighting-resources
+  let operationDictionaryLocal = {};
+  let mainOperationsDataLocal = "";
+  let startingIndex = 0;
+  let total = 3;
+  let finalIndex = total;
+  let operationList = dataFunctionNames[operation].list;
+
+  while (startingIndex < operationList.length) {
+    mainOperationsDataLocal = await fetchReadOnlyBalances(
+      `http://localhost:3999/v2/contracts/call-read/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM/main-sc/${dataFunctionNames[operation].functionName}`,
+      operationList.slice(startingIndex, finalIndex),
+      userAddress
+    );
+    startingIndex += total;
+    finalIndex += total;
+    if (mainOperationsDataLocal != "") {
+      // for every returned value, keep number of resources sets (resource-id, resource-qty)
+
+      mainOperationsDataLocal.value.forEach((element) => {
+        // key - token id
+
+        let dictionaryKey =
+          element.value[dataFunctionNames[operation].key].value;
+
+        // keep only what is necessarry
+
+        let dictValue =
+          element.value[dataFunctionNames[operation].value].value.value;
+
+        if (operationDictionaryLocal[dictionaryKey])
+          operationDictionaryLocal[dictionaryKey] = dictValue;
+        else
+          operationDictionaryLocal = {
+            ...operationDictionaryLocal,
+            [dictionaryKey]: dictValue,
+          };
+      });
+    }
+  }
+  return operationDictionaryLocal;
+};
+
 export const fetchTupleOperationData = async (operation) => {
   /// e.g. operation = fighting-resources
   let operationDictionaryLocal = {};
   let rewardsDataLocal = "";
   let startingIndex = 0;
-  let total = 5;
+  let total = 6;
   let finalIndex = total;
   let operationList = dataFunctionNames[operation].list;
 

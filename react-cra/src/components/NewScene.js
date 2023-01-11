@@ -11,6 +11,7 @@ import {
 } from "../constants/dataLists";
 
 export const NewScene = (props) => {
+  // make a fn to get an id as an arg and return whether true or false (if sufficient balance)
   const { operation, menuPage, setMenuPage, mainDataDictionary } = props;
   const [selectedType, setSelectedType] = useState("sword");
   const [selectedItem, setSelectedItem] = useState(0);

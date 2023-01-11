@@ -66,4 +66,10 @@ export const dataFunctionNames = {
     value: "token-name-data",
     list: itemsList,
   },
+  balances: {
+    functionName: "all-balances-user",
+    key: "token-id",
+    value: "balance",
+    list: itemsList,
+  },
 };

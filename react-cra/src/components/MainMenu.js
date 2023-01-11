@@ -5,6 +5,7 @@ import "../menu.css";
 import NavBar from "./NavBar";
 import { NewScene } from "./NewScene";
 import {
+  fetchBalancesData,
   fetchMainOperationData,
   fetchTokenNameData,
   fetchTupleOperationData,
@@ -115,6 +116,11 @@ export const MainMenu = () => {
 
     mainDataDictionaryLocal["token-name"] = await fetchTokenNameData(
       "tokenName"
+    );
+
+    mainDataDictionaryLocal["balances"] = await fetchBalancesData(
+      "balances",
+      "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4"
     );
     console.log(mainDataDictionaryLocal);
     if (mainDataDictionaryLocal) {
@@ -246,7 +252,6 @@ export const MainMenu = () => {
                               Object.keys(
                                 mainDataDictionary["sleeping"][time]
                               ).map((rewardSet) => {
-                                console.log(rewardSet);
                                 return (
                                   <div className="img-container-new-scene">
                                     <figure>
