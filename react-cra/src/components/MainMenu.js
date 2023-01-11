@@ -10,13 +10,22 @@ import {
   fetchTupleOperationData,
 } from "../utils/dataFetchingFuntions";
 import { PopupScene } from "./PopupScene";
-import { itemsList } from "../constants/dataLists";
+import {
+  itemsList,
+  itemTypeDictionary,
+  miningHarvestingSleepingTimes,
+} from "../constants/dataLists";
 import { baseImgUrl } from "../constants/baseImgUrl";
 
 export const MainMenu = () => {
   const [operation, setOperation] = useState("");
-  const [menuPage, setMenuPage] = useState("Loading");
+  const [menuPage, setMenuPage] = useState("MainMenu");
   const [mainDataDictionary, setMainDataDictionary] = useState({});
+  const [selectedMiningItem, setSelectedMiningItem] = useState("");
+  const [selectedHarvestingItem, setSelectedHarvestingItem] = useState("");
+  const [selectedSleepingTime, setSelectedSleepingTime] = useState("");
+  const [selectedMiningTime, setSelectedMiningTime] = useState("");
+  const [selectedHarvestingTime, setSelectedHarvestingTime] = useState("");
   const [hasRespondedData, setHasRespondedData] = useState(false);
   const [operationData, setOperationData] = useState({
     itemsImages: {},
@@ -29,11 +38,13 @@ export const MainMenu = () => {
     mining: {},
     harvesting: {},
   });
-  const miningFunction = () => {
+  const miningFunction = (time) => {
+    setSelectedMiningTime(time);
     setOperation("Mine");
     setMenuPage("PopupScene");
   };
-  const sleepingFunction = () => {
+  const sleepingFunction = (time) => {
+    setSelectedSleepingTime(time);
     setOperation("Sleep");
     setMenuPage("PopupScene");
   };
@@ -53,7 +64,8 @@ export const MainMenu = () => {
     setOperation("Exploring");
     setMenuPage("PopupScene");
   };
-  const lumberjackFunction = () => {
+  const lumberjackFunction = (time) => {
+    setSelectedHarvestingTime(time);
     setOperation("Lumberjack");
     setMenuPage("PopupScene");
   };
@@ -91,6 +103,10 @@ export const MainMenu = () => {
       "acquisition"
     );
 
+    mainDataDictionaryLocal["sleeping"] = await fetchMainOperationData(
+      "sleeping"
+    );
+
     mainDataDictionaryLocal["mining"] = await fetchTupleOperationData("mining");
 
     mainDataDictionaryLocal["harvesting"] = await fetchTupleOperationData(
@@ -100,108 +116,304 @@ export const MainMenu = () => {
     mainDataDictionaryLocal["token-name"] = await fetchTokenNameData(
       "tokenName"
     );
-    setMainDataDictionary(mainDataDictionaryLocal);
-    setMenuPage("MainMenu");
+    console.log(mainDataDictionaryLocal);
+    if (mainDataDictionaryLocal) {
+      setMainDataDictionary(mainDataDictionaryLocal);
+      setHasRespondedData(true);
+    }
   }, [setMainDataDictionary]);
 
   useEffect(() => {
     fetchMainDictionary();
-  }, [setMainDataDictionary]);
+    console.log(mainDataDictionary);
+  }, [setHasRespondedData]);
+
+  // const popUpMapping={
+  //   mining:
+  // }
 
   const menuPageMapping = {
-    Loading: <div>Loading...</div>,
     MainMenu: (
       <div className="fullscreen-div">
-        <NavBar />
-        <div className="container-div">
-          <img
-            className="World-map-full"
-            src={mainMenuMap}
-            alt="worldMap"
-            useMap="#worldMap"
-          />
-          <span className="mining-span">
-            <div className="tooltipTop">
-              <span className="tooltipTextTop">
-                <h3>Mine</h3>
-                Here you can mine in order to collect resources.
-                <br />
-                <br />
-                <button onClick={miningFunction}>Mine</button>
+        {!hasRespondedData && <div>Loading...</div>}
+        {hasRespondedData && (
+          <div>
+            <NavBar />
+            <div className="container-div">
+              <img
+                className="World-map-full"
+                src={mainMenuMap}
+                alt="worldMap"
+                useMap="#worldMap"
+              />
+              <span className="mining-span">
+                <div className="tooltipTop">
+                  <span className="tooltipTextTop">
+                    <h3>Mine</h3>
+                    Here you can mine in order to collect resources. You can
+                    mine using:
+                    <br></br>
+                    {mainDataDictionary["itemsImages"] &&
+                      itemTypeDictionary.pickaxe.map((pickaxe) => {
+                        return (
+                          <div
+                            key={pickaxe}
+                            className="img-container-new-scene"
+                            onClick={() =>
+                              setSelectedMiningItem(pickaxe.toString())
+                            }
+                          >
+                            <figure>
+                              <img
+                                src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary["itemsImages"][pickaxe]}`}
+                                key={pickaxe}
+                              ></img>
+                              <figcaption>
+                                {mainDataDictionary["token-name"] &&
+                                  mainDataDictionary["token-name"][
+                                    pickaxe
+                                  ].name.replaceAll("_", " ")}
+                              </figcaption>
+                            </figure>
+                          </div>
+                        );
+                      })}
+                    {miningHarvestingSleepingTimes.map((time) => {
+                      return (
+                        <div
+                          className="tooltipChild"
+                          onClick={() => miningFunction(time)}
+                        >
+                          {time} minutes
+                          <span className="tooltipTextChild ">
+                            {mainDataDictionary["mining"] &&
+                              selectedMiningItem != "" &&
+                              Object.keys(
+                                mainDataDictionary["mining"][
+                                  selectedMiningItem
+                                ][time]
+                              ).map((rewardSet) => {
+                                console.log(rewardSet);
+                                return (
+                                  <div className="img-container-new-scene">
+                                    <figure>
+                                      <img
+                                        width={"20px"}
+                                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                                          mainDataDictionary["itemsImages"][
+                                            mainDataDictionary["mining"][
+                                              selectedMiningItem
+                                            ][time][rewardSet]["resource-id"]
+                                              .value
+                                          ]
+                                        }`}
+                                      ></img>
+                                      <figcaption>
+                                        {
+                                          mainDataDictionary["mining"][
+                                            selectedMiningItem
+                                          ][time][rewardSet]["resource-qty"]
+                                            .value
+                                        }
+                                      </figcaption>
+                                    </figure>
+                                  </div>
+                                );
+                              })}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </span>
+                </div>
+              </span>
+              <span className="sleeping-span">
+                <div className="tooltipTop">
+                  <span className="tooltipTextTop">
+                    <h3>Your Home</h3>
+                    Here you can rest in order to restore energy. You can sleep
+                    for:
+                    <br />
+                    {miningHarvestingSleepingTimes.map((time) => {
+                      return (
+                        <div
+                          className="tooltipChild"
+                          onClick={() => sleepingFunction(time)}
+                        >
+                          {time} minutes
+                          <span className="tooltipTextChild ">
+                            {mainDataDictionary["sleeping"] &&
+                              Object.keys(
+                                mainDataDictionary["sleeping"][time]
+                              ).map((rewardSet) => {
+                                console.log(rewardSet);
+                                return (
+                                  <div className="img-container-new-scene">
+                                    <figure>
+                                      <img
+                                        width={"20px"}
+                                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                                          mainDataDictionary["itemsImages"][
+                                            mainDataDictionary["sleeping"][
+                                              time
+                                            ][rewardSet]["resource-id"].value
+                                          ]
+                                        }`}
+                                      ></img>
+                                      <figcaption>
+                                        {
+                                          mainDataDictionary["sleeping"][time][
+                                            rewardSet
+                                          ]["resource-qty"].value
+                                        }
+                                      </figcaption>
+                                    </figure>
+                                  </div>
+                                );
+                              })}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    <br />
+                    {/* <button onClick={sleepingFunction}>Sleep</button> */}
+                  </span>
+                </div>
+              </span>
+              <span className="shop-span">
+                <div className="tooltipTop">
+                  <span className="tooltipTextTop">
+                    <h3> Shop</h3>
+                    Here you can buy items.
+                    <br />
+                    <br />
+                    <button onClick={shopFunction}>Shop</button>
+                  </span>
+                </div>
+              </span>
+              <span className="smith-span">
+                <div className="tooltipTop">
+                  <span className="tooltipTextTop">
+                    <h3>Smith</h3>
+                    Here you can:
+                    <br />
+                    <br />
+                    <button onClick={craftFunction}>Craft</button>
+                    <button onClick={levelUpFunction}>Level-up</button>
+                  </span>
+                </div>
+              </span>
+              <span className="explore-span">
+                <div className="tooltipBottom">
+                  <span className="tooltipTextBottom">
+                    <h3> Exploring the woods here!</h3>
+                    Here you can explore the woods. Who knows what will happen?
+                    <br />
+                    <br />
+                    <button onClick={exploreFunction}>Explore</button>
+                  </span>
+                </div>
+              </span>
+              <span className="woodchuck-span">
+                <div className="tooltipBottom">
+                  <span className="tooltipTextBottom">
+                    <h3>Forest</h3>
+                    Here you can cut trees in order to collect wood, using:
+                    <br />
+                    {mainDataDictionary["itemsImages"] &&
+                      itemTypeDictionary.axe.map((axe) => {
+                        return (
+                          <div
+                            key={axe}
+                            className="img-container-new-scene"
+                            onClick={() =>
+                              setSelectedHarvestingItem(axe.toString())
+                            }
+                          >
+                            <figure>
+                              <img
+                                src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary["itemsImages"][axe]}`}
+                                key={axe}
+                              ></img>
+                              <figcaption>
+                                {mainDataDictionary["token-name"] &&
+                                  mainDataDictionary["token-name"][
+                                    axe
+                                  ].name.replaceAll("_", " ")}
+                              </figcaption>
+                            </figure>
+                          </div>
+                        );
+                      })}
+                    {miningHarvestingSleepingTimes.map((time) => {
+                      return (
+                        <div
+                          className="tooltipChild"
+                          onClick={() => lumberjackFunction(time)}
+                        >
+                          {time} minutes
+                          <span className="tooltipTextChild ">
+                            {mainDataDictionary["mining"] &&
+                              selectedHarvestingItem != "" &&
+                              Object.keys(
+                                mainDataDictionary["harvesting"][
+                                  selectedHarvestingItem
+                                ][time]
+                              ).map((rewardSet) => {
+                                console.log(rewardSet);
+                                return (
+                                  <div className="img-container-new-scene">
+                                    <figure>
+                                      <img
+                                        width={"20px"}
+                                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                                          mainDataDictionary["itemsImages"][
+                                            mainDataDictionary["harvesting"][
+                                              selectedHarvestingItem
+                                            ][time][rewardSet]["resource-id"]
+                                              .value
+                                          ]
+                                        }`}
+                                      ></img>
+                                      <figcaption>
+                                        {
+                                          mainDataDictionary["harvesting"][
+                                            selectedHarvestingItem
+                                          ][time][rewardSet]["resource-qty"]
+                                            .value
+                                        }
+                                      </figcaption>
+                                    </figure>
+                                  </div>
+                                );
+                              })}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    {/* <button onClick={lumberjackFunction}>
+                      Start Harvesting
+                    </button> */}
+                  </span>
+                </div>
+              </span>
+              <span className="fight-span">
+                <div className="tooltipBottom">
+                  <span className="tooltipTextBottom">
+                    <h3>Fighting here!</h3>
+                    <br />
+                    Last Fight:
+                    <br />
+                    Upcoming Fight:
+                    <br />
+                    <br />
+                    <button onClick={fightFunction}>Fight</button>
+                  </span>
+                </div>
               </span>
             </div>
-          </span>
-          <span className="sleeping-span">
-            <div className="tooltipTop">
-              <span className="tooltipTextTop">
-                <h3>Your Home</h3>
-                Here you can rest in order to restore energy.
-                <br />
-                <br />
-                <button onClick={sleepingFunction}>Sleep</button>
-              </span>
-            </div>
-          </span>
-          <span className="shop-span">
-            <div className="tooltipTop">
-              <span className="tooltipTextTop">
-                <h3> Shop</h3>
-                Here you can buy items.
-                <br />
-                <br />
-                <button onClick={shopFunction}>Shop</button>
-              </span>
-            </div>
-          </span>
-          <span className="smith-span">
-            <div className="tooltipTop">
-              <span className="tooltipTextTop">
-                <h3>Smith</h3>
-                Here you can:
-                <br />
-                <br />
-                <button onClick={craftFunction}>Craft</button>
-                <button onClick={levelUpFunction}>Level-up</button>
-              </span>
-            </div>
-          </span>
-          <span className="explore-span">
-            <div className="tooltipBottom">
-              <span className="tooltipTextBottom">
-                <h3> Exploring the woods here!</h3>
-                Here you can explore the woods. Who knows what will happen?
-                <br />
-                <br />
-                <button onClick={exploreFunction}>Explore</button>
-              </span>
-            </div>
-          </span>
-          <span className="woodchuck-span">
-            <div className="tooltipBottom">
-              <span className="tooltipTextBottom">
-                <h3>Forest</h3>
-                Here you can cut trees in order to collect wood.
-                <br />
-                <br />
-                <button onClick={lumberjackFunction}>Start Harvesting</button>
-              </span>
-            </div>
-          </span>
-          <span className="fight-span">
-            <div className="tooltipBottom">
-              <span className="tooltipTextBottom">
-                <h3>Fighting here!</h3>
-                <br />
-                Last Fight:
-                <br />
-                Upcoming Fight:
-                <br />
-                <br />
-                <button onClick={fightFunction}>Fight</button>
-              </span>
-            </div>
-          </span>
-        </div>
+          </div>
+        )}
       </div>
     ),
     PopupScene: (
@@ -219,6 +431,11 @@ export const MainMenu = () => {
             setMenuPage={setMenuPage}
             mainDataDictionary={mainDataDictionary}
             operation={operation}
+            selectedSleepingTime={selectedSleepingTime}
+            selectedHarvestingTime={selectedHarvestingTime}
+            selectedMiningTime={selectedMiningTime}
+            selectedHarvestingItem={selectedHarvestingItem}
+            selectedMiningItem={selectedMiningItem}
           ></PopupScene>
         </div>
       </div>

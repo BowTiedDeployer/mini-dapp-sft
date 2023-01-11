@@ -48,3 +48,4 @@ export const itemTypeDictionary = {
   axe: [52, 53, 54],
   pickaxe: [55, 56, 57],
 };
+export const miningHarvestingSleepingTimes = [5, 10, 20];

@@ -124,7 +124,9 @@
 }
 .tooltipTop .tooltipTextTop {
   visibility: hidden;
-  width: 200px;
+  display: none;
+
+  width: 500px;
   background-color: burlywood;
   color: black;
   text-align: center;
@@ -143,6 +145,7 @@
 }
 .tooltipTop:hover .tooltipTextTop {
   visibility: visible;
+  display: inline-block;
 }
 .tooltipBottom {
   position: relative;
@@ -152,7 +155,8 @@
 }
 .tooltipBottom .tooltipTextBottom {
   visibility: hidden;
-  width: 200px;
+  display: none;
+  width: 500px;
   background-color: burlywood;
   color: black;
   text-align: center;
@@ -171,6 +175,38 @@
 }
 .tooltipBottom:hover .tooltipTextBottom {
   visibility: visible;
+  display: block;
+}
+
+.tooltipChild {
+  position: relative;
+  height: 100%;
+  /* display: inline-block; */
+  border: 2px dotted green;
+}
+.tooltipChild .tooltipTextChild {
+  visibility: hidden;
+  display: none;
+
+  width: 50%;
+  background-color: burlywood;
+  color: black;
+  text-align: center;
+  border: 2px;
+  border-style: solid;
+  border-color: #000;
+  border-radius: 6px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1080;
+  bottom: 100%;
+  /* left: 60%; */
+  margin-left: -100px;
+}
+.tooltipChild:hover .tooltipTextChild {
+  visibility: visible;
+  display: inline-block;
 }
 .popup {
   position: fixed;
