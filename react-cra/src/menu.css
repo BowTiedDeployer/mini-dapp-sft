@@ -249,6 +249,20 @@
   display: inline-block;
   text-align: center;
 }
+
+.img-container-new-scene-no-balance {
+  width: 30%;
+  padding: 1px;
+  margin: 10px;
+  display: inline-block;
+  text-align: center;
+  opacity: 50%;
+}
+
+.font-color-no-balance {
+  color: red;
+}
+
 .new-scene-container {
   width: 100%;
   padding: 1px;
