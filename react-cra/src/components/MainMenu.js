@@ -22,6 +22,12 @@ export const MainMenu = () => {
   const [operation, setOperation] = useState("");
   const [menuPage, setMenuPage] = useState("MainMenu");
   const [mainDataDictionary, setMainDataDictionary] = useState({});
+  const [selectedSword, setSelectedSword] = useState("");
+  const [selectedArmor, setSelectedArmor] = useState("");
+  const [selectedHelmet, setSelectedHelmet] = useState("");
+  const [selectedShield, setSelectedShield] = useState("");
+  const [selectedShoes, setSelectedShoes] = useState("");
+
   const [selectedMiningItem, setSelectedMiningItem] = useState("");
   const [selectedHarvestingItem, setSelectedHarvestingItem] = useState("");
   const [selectedSleepingTime, setSelectedSleepingTime] = useState("");
@@ -140,7 +146,12 @@ export const MainMenu = () => {
         {!hasRespondedData && <div>Loading...</div>}
         {hasRespondedData && (
           <div>
-            <NavBar />
+            <NavBar
+              menuPage={menuPage}
+              setMenuPage={setMenuPage}
+              operation={operation}
+              setOperation={setOperation}
+            />
             <div className="container-div">
               <img
                 className="World-map-full"
@@ -564,7 +575,12 @@ export const MainMenu = () => {
     ),
     PopupScene: (
       <div className="fullscreen-div">
-        <NavBar />
+        <NavBar
+          menuPage={menuPage}
+          setMenuPage={setMenuPage}
+          operation={operation}
+          setOperation={setOperation}
+        />
         <div className="container-div">
           <img
             className="World-map-full-transparent"
@@ -588,43 +604,30 @@ export const MainMenu = () => {
     ),
     NewScene: (
       <div className="fullscreen-div">
-        <NavBar />
-        <NewScene
+        <NavBar
           menuPage={menuPage}
           setMenuPage={setMenuPage}
+          operation={operation}
+          setOperation={setOperation}
+        />
+        <NewScene
+          menuPage={menuPage}
           mainDataDictionary={mainDataDictionary}
           operation={operation}
+          selectedSword={selectedSword}
+          selectedArmor={selectedArmor}
+          selectedShield={selectedShield}
+          selectedHelmet={selectedHelmet}
+          selectedShoes={selectedShoes}
+          setMenuPage={setMenuPage}
+          setSelectedSword={setSelectedSword}
+          setSelectedArmor={setSelectedArmor}
+          setSelectedShield={setSelectedShield}
+          setSelectedHelmet={setSelectedHelmet}
+          setSelectedShoes={setSelectedShoes}
         />
       </div>
     ),
-    // LevelUp: (
-    //   <div className="fullscreen-div">
-    //     <NavBar />
-    //     <NewScene
-    //       menuPage={menuPage}
-    //       setMenuPage={setMenuPage}
-    //       mainDataDictionary={mainDataDictionary}
-    //     />
-    //   </div>
-    // ),
-    // Shop: (
-    //   <div className="fullscreen-div">
-    //     <NavBar />
-    //     <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />
-    //   </div>
-    // ),
-    // Inventory: (
-    //   <div className="fullscreen-div">
-    //     <NavBar />
-    //     <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />
-    //   </div>
-    // ),
-    // Fight: (
-    //   <div className="fullscreen-div">
-    //     <NavBar />
-    //     <NewScene menuPage={menuPage} setMenuPage={setMenuPage} />
-    //   </div>
-    // ),
   };
 
   return menuPageMapping[menuPage];

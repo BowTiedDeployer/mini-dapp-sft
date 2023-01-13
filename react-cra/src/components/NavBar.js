@@ -10,7 +10,12 @@ function disconnect() {
   userSession.signUserOut("/");
 }
 
-function NavBar() {
+export const NavBar = (props) => {
+  const { menuPage, setMenuPage, operation, setOperation } = props;
+  const inventoryFunction = () => {
+    setOperation("Inventory");
+    setMenuPage("NewScene");
+  };
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Container>
@@ -18,8 +23,7 @@ function NavBar() {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#features">Inventory</Nav.Link>
-            {/* <Nav.Link href="#pricing">Pricing</Nav.Link> */}
+            <Nav.Link onClick={inventoryFunction}>Inventory</Nav.Link>
             <NavDropdown title="Dropdown" id="collasible-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">
@@ -32,18 +36,7 @@ function NavBar() {
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
-          {/* <Nav>
-            <Nav.Link eventKey={2} href="#memes">
-              Dank memes
-            </Nav.Link> 
-          </Nav>*/}
           <Form className="d-flex">
-            {/* <Form.Control
-              type="search"
-              placeholder="Search"
-              className="me-2"
-              aria-label="Search"
-            /> */}
             <Button onClick={disconnect} variant="outline-success">
               Disconnect Wallet
             </Button>
@@ -53,6 +46,6 @@ function NavBar() {
       </Container>
     </Navbar>
   );
-}
+};
 
 export default NavBar;
