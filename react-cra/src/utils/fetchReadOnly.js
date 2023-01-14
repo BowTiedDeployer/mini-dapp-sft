@@ -49,7 +49,7 @@ export const fetchReadOnlyBalances = async (
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      sender: "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4",
+      sender: "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4", // userAddress
       //userSession.loadUserData().profile.stxAddress.devnet, // todo: check this
       network: network,
       arguments: [
