@@ -22,12 +22,28 @@ export const MainMenu = () => {
   const [operation, setOperation] = useState("");
   const [menuPage, setMenuPage] = useState("MainMenu");
   const [mainDataDictionary, setMainDataDictionary] = useState({});
-  const [selectedSword, setSelectedSword] = useState("");
-  const [selectedArmor, setSelectedArmor] = useState("");
-  const [selectedHelmet, setSelectedHelmet] = useState("");
-  const [selectedShield, setSelectedShield] = useState("");
-  const [selectedShoes, setSelectedShoes] = useState("");
-
+  const [selectedSword, setSelectedSword] = useState(
+    localStorage.getItem("selectedSword")
+  );
+  const [selectedArmor, setSelectedArmor] = useState(
+    localStorage.getItem("selectedArmor")
+  );
+  const [selectedHelmet, setSelectedHelmet] = useState(
+    localStorage.getItem("selectedHelmet")
+  );
+  const [selectedShield, setSelectedShield] = useState(
+    localStorage.getItem("selectedShield")
+  );
+  const [selectedShoes, setSelectedShoes] = useState(
+    localStorage.getItem("selectedShoes")
+  );
+  console.log(
+    selectedSword,
+    selectedArmor,
+    selectedHelmet,
+    selectedShield,
+    selectedShoes
+  );
   const [selectedMiningItem, setSelectedMiningItem] = useState("");
   const [selectedHarvestingItem, setSelectedHarvestingItem] = useState("");
   const [selectedSleepingTime, setSelectedSleepingTime] = useState("");

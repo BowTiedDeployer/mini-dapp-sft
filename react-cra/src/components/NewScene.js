@@ -31,7 +31,6 @@ export const NewScene = (props) => {
   const [selectedType, setSelectedType] = useState("sword");
   const [selectedItem, setSelectedItem] = useState(0);
   const craftLikeOperationList = ["Craft", "LevelUp", "Shop", "Inventory"];
-  console.log(mainDataDictionary["itemsImages"][5]);
   const checkBalanceByOperation = (itemId, operation) => {
     let value = true;
     Object.keys(mainDataDictionary[operation][itemId]).forEach(
@@ -50,7 +49,6 @@ export const NewScene = (props) => {
         }
       }
     );
-    console.log(true);
     return value;
   };
 
@@ -88,7 +86,6 @@ export const NewScene = (props) => {
     setSelectedItem(itemId);
   };
   const onClickInventory = (itemId) => {
-    console.log(selectedType);
     if (selectedType == "sword") {
       localStorage.setItem("selectedSword", itemId);
       setSelectedSword(itemId);
@@ -106,7 +103,6 @@ export const NewScene = (props) => {
       setSelectedShoes(itemId);
     }
   };
-  console.log(mainDataDictionary);
   const newSceneMapping = {
     Shop: (
       <div>
@@ -184,70 +180,74 @@ export const NewScene = (props) => {
               <br></br>
               Needed Resources:
               <br></br>
-              {mainDataDictionary.acquisition[selectedItem] &&
-                Object.keys(mainDataDictionary.acquisition[selectedItem]).map(
-                  (resourceSet) => {
-                    if (
-                      parseInt(
-                        mainDataDictionary["balances"][
+              {
+                mainDataDictionary.acquisition[selectedItem] &&
+                  Object.keys(mainDataDictionary.acquisition[selectedItem]).map(
+                    (resourceSet) => {
+                      if (
+                        parseInt(
+                          mainDataDictionary["balances"][
+                            mainDataDictionary.acquisition[selectedItem][
+                              resourceSet
+                            ]["resource-id"].value
+                          ]
+                        ) >
+                        parseInt(
                           mainDataDictionary.acquisition[selectedItem][
                             resourceSet
-                          ]["resource-id"].value
-                        ]
-                      ) >
-                      parseInt(
-                        mainDataDictionary.acquisition[selectedItem][
-                          resourceSet
-                        ]["resource-qty"].value
+                          ]["resource-qty"].value
+                        )
                       )
-                    )
-                      return (
-                        <div className="img-container-new-scene">
-                          <figure>
-                            <img
-                              src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                mainDataDictionary.itemsImages[
+                        return (
+                          <div className="img-container-new-scene">
+                            <figure>
+                              <img
+                                src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                                  mainDataDictionary.itemsImages[
+                                    mainDataDictionary.acquisition[
+                                      selectedItem
+                                    ][resourceSet]["resource-id"].value
+                                  ]
+                                }`}
+                              ></img>
+                              <figcaption>
+                                {
                                   mainDataDictionary.acquisition[selectedItem][
                                     resourceSet
-                                  ]["resource-id"].value
-                                ]
-                              }`}
-                            ></img>
-                            <figcaption>
-                              {
-                                mainDataDictionary.acquisition[selectedItem][
-                                  resourceSet
-                                ]["resource-qty"].value
-                              }
-                            </figcaption>
-                          </figure>
-                        </div>
-                      );
-                    else
-                      return (
-                        <div className="img-container-new-scene">
-                          <figure>
-                            <img
-                              src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                mainDataDictionary.itemsImages[
+                                  ]["resource-qty"].value
+                                }
+                              </figcaption>
+                            </figure>
+                            <button>Buy Item</button>
+                          </div>
+                        );
+                      else
+                        return (
+                          <div className="img-container-new-scene">
+                            <figure>
+                              <img
+                                src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                                  mainDataDictionary.itemsImages[
+                                    mainDataDictionary.acquisition[
+                                      selectedItem
+                                    ][resourceSet]["resource-id"].value
+                                  ]
+                                }`}
+                              ></img>
+                              <figcaption className="font-color-no-balance">
+                                {
                                   mainDataDictionary.acquisition[selectedItem][
                                     resourceSet
-                                  ]["resource-id"].value
-                                ]
-                              }`}
-                            ></img>
-                            <figcaption className="font-color-no-balance">
-                              {
-                                mainDataDictionary.acquisition[selectedItem][
-                                  resourceSet
-                                ]["resource-qty"].value
-                              }
-                            </figcaption>
-                          </figure>
-                        </div>
-                      );
-                  }
-                )}
+                                  ]["resource-qty"].value
+                                }
+                              </figcaption>
+                            </figure>
+                          </div>
+                        );
+                    }
+                  )
+                // <button disabled={}>Insufficient Balance</button>
+              }
             </div>
           )}
         </div>
