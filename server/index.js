@@ -8,15 +8,18 @@ import {
   PostConditionMode,
   broadcastTransaction,
   makeContractCall,
+  NonFungibleConditionCode,
+  createAssetInfo,
+  makeStandardNonFungiblePostCondition,
 } from '@stacks/transactions';
 import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { adminAddress, coreApiUrl, maxStacksTxFee, network, privateKey } from './consts.js';
+import { adminAddress, contractAddress, coreApiUrl, maxStacksTxFee, network, privateKey } from './consts.js';
 import { serializePayload } from '@stacks/transactions/dist/payload.js';
 
-let networkInstance =
+const networkInstance =
   network == 'mainnet' ? new StacksMainnet() : network == 'testnet' ? new StacksTestnet() : new StacksMocknet();
 
 // address is parsed from client
@@ -58,38 +61,29 @@ app.post('/rewarding-mining', async (req, res) => {
     if (Number.isInteger(token_id) == false || Number.isInteger(mininng_time) == false) res.sendStatus(400);
 
     //get nonce
-    const latestNonce = await getAccountNonce(address);
+    const latestNonce = await getAccountNonce(adminAddress[network]);
 
     //functionArgs
     let args = [uintCV(token_id), uintCV(mininng_time), standardPrincipalCV(address)];
 
-    console.log('calling function');
+    // postConditions
+    // based on what it should get on that specific call
+    // the reward here is more dinamic than on the sleeping because it also depends on the pickaxe_id
 
     // txoptions
     let txOptions = {
-      contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+      contractAddress: contractAddress[network],
       contractName: 'main-sc',
       functionName: 'reward-mining',
       functionArgs: args,
       senderKey: privateKey[network],
-      network: network,
+      network: networkInstance,
       // postConditions,
-      postConditionMode: PostConditionMode.Allow,
-      fee: 100000,
+      postConditionMode: PostConditionMode.Allow, // TODO: set Deny
+      fee: 10000n, // 0.01 STX
       nonce: latestNonce,
     };
-
-    console.log('working after initial txOptions');
-
-    // find fee
     let transaction = await makeContractCall(txOptions);
-    const normalizedFee = await getNormalizedFee(transaction);
-
-    console.log('updated fee ' + normalizedFee);
-
-    //set fee
-    txOptions.fee = normalizedFee;
-    transaction = await makeContractCall(txOptions);
 
     // broadcast
     const tx = await broadcastTransaction(transaction, networkInstance);
@@ -101,26 +95,74 @@ app.post('/rewarding-mining', async (req, res) => {
   }
 });
 
+app.post('/rewarding-sleeping', async (req, res) => {
+  try {
+    const sleeping_time = req.body.time;
+    const address = req.body.address;
+
+    // check type correct, if not throw status error
+    if (Number.isInteger(sleeping_time) == false) res.sendStatus(400);
+
+    //get nonce
+    const latestNonce = await getAccountNonce(adminAddress[network]);
+
+    //functionArgs
+    let args = [uintCV(sleeping_time), standardPrincipalCV(address)];
+
+    // postConditions
+    // based on what it should get on that specific call
+    // if sleep_time = 5 -> reward 5
+    // if sleep_time = 10 -> reward 15
+    // if sleep_time = 20 -> reward 40
+
+    // txoptions
+    let txOptions = {
+      contractAddress: contractAddress[network],
+      contractName: 'main-sc',
+      functionName: 'reward-sleeping',
+      functionArgs: args,
+      senderKey: privateKey[network],
+      network: networkInstance,
+      // postConditions,
+      postConditionMode: PostConditionMode.Allow, // TODO: set Deny
+      fee: 10000n, // 0.01 STX
+      nonce: latestNonce,
+    };
+    let transaction = await makeContractCall(txOptions);
+
+    // broadcast
+    const tx = await broadcastTransaction(transaction, networkInstance);
+    console.log('sleeping-reward broadcasted tx: ', tx);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log('sleeping-reward error: ', error);
+    res.sendStatus(400);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
-export async function getAccountNonce(queryAddress) {
-  const url = `${coreApiUrl}/extended/v1/address/${queryAddress}/nonces?unanchored=true`;
-  const accountUrl = `${coreApiUrl}/v2/accounts/${queryAddress}`;
+async function getAccountNonce(queryAddress) {
+  const url = `${coreApiUrl[network]}/extended/v1/address/${queryAddress}/nonces?unanchored=true`;
+  const accountUrl = `${coreApiUrl[network]}/v2/accounts/${queryAddress}`;
+  console.log(url, accountUrl);
   try {
     const response = await fetch(url).then((res) => res.json());
     const accresponse = await fetch(accountUrl).then((res) => res.json());
-    const accountNonce = await accresponse.data.nonce;
-    let stacksNonce = await response.data.possible_next_nonce;
+    const accountNonce = await accresponse.nonce;
+    let stacksNonce = await response.possible_next_nonce;
+    console.log(accountNonce, stacksNonce);
     if (accountNonce > stacksNonce) stacksNonce = accountNonce;
-    console.log('init stacksNonce ', queryAddress, stacksNonce, response.data);
-    if (response.data.detected_missing_nonces.length > 0) {
+    console.log('init stacksNonce ', queryAddress, stacksNonce, response);
+    if (response.detected_missing_nonces.length > 0) {
       // set nonce to min of missing nonces
-      const min = Math.min(...response.data.detected_missing_nonces);
+      const min = Math.min(...response.detected_missing_nonces);
       console.log(`found missing nonces setting to min `, min);
       stacksNonce = min;
     }
+    console.log('found nonces setting to: ', stacksNonce);
     return stacksNonce;
   } catch (e) {
     console.log(`getAccountNonce error: `, e);
@@ -128,45 +170,24 @@ export async function getAccountNonce(queryAddress) {
   }
 }
 
-export const getFeev2 = async (estimated_len, transaction_payload) => {
-  try {
-    let reqobj = {
-      estimated_len,
-      transaction_payload,
-    };
+// TODO: make it custom for SFTs
+const createNonFungiblePostConfition = (userAddress, id, contract) => {
+  const postConditionAddress = userAddress;
+  const postConditionCode = NonFungibleConditionCode.Sends;
+  // const assetAddress = contractsNFT[network].lootbox_background.split('.')[0];
+  // const assetContractName = contractsNFT[network].lootbox_background.split('.')[1].split('::')[0];
+  // const assetName = contractsNFT[network].lootbox_background.split('.')[1].split('::')[1];
+  const assetAddress = contract.split('.')[0];
+  const assetContractName = contract.split('.')[1].split('::')[0];
+  const assetName = contract.split('.')[1].split('::')[1];
 
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sender: adminAddress[network],
-        //userSession.loadUserData().profile.stxAddress.devnet, // todo: check this
-        network: network,
-        arguments: [
-          // cvToHex(principalCV(userAddress)),
-          // cvToHex(listCV(convertedList)),
-          reqobj,
-        ],
-      }),
-    };
+  const tokenAssetName = uintCV(id);
+  const nonFungibleAssetInfo = createAssetInfo(assetAddress, assetContractName, assetName);
 
-    const url = `${coreApiUrl}/v2/fees/transaction`;
-    // const response = await fetch() .post(url, reqobj);
-    let returnedData = await fetch(url, requestOptions).then((res) => res.json());
-    console.log(returnedData);
-
-    return returnedData.data.estimations[0].fee;
-  } catch (err) {
-    console.log('getFeev2 err ', err.message);
-    return 50000;
-  }
-};
-
-export const getNormalizedFee = async (transaction) => {
-  const serializedTx = transaction.serialize();
-  const serializedPayload = serializePayload(transaction.payload);
-  const v2fee = await getFeev2(serializedTx.byteLength, serializedPayload.toString('hex'));
-  const normalizedFee = Math.min(maxStacksTxFee, Number(v2fee));
-  console.log('normalizedFee ', normalizedFee);
-  return normalizedFee;
+  return makeStandardNonFungiblePostCondition(
+    postConditionAddress,
+    postConditionCode,
+    nonFungibleAssetInfo,
+    tokenAssetName
+  );
 };

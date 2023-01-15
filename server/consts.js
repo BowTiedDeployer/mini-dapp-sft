@@ -18,3 +18,9 @@ export const adminAddress = {
   testnet: '',
   mocknet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
 };
+
+export const contractAddress = {
+  mainnet: '',
+  testnet: '',
+  mocknet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+};
