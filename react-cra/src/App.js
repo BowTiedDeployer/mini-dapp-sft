@@ -1,6 +1,6 @@
-import "./App.css";
-import ConnectWallet from "./components/ConnectWallet";
-import React from "react";
+import './App.css';
+import ConnectWallet from './components/ConnectWallet';
+import React from 'react';
 
 export const App = () => {
   return (

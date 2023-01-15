@@ -1,100 +1,82 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { AppConfig, UserSession } from "@stacks/connect";
-import mainMenuMap from "../resources/world-map.png";
-import "../menu.css";
-import NavBar from "./NavBar";
-import { NewScene } from "./NewScene";
+import React, { useCallback, useEffect, useState } from 'react';
+import { AppConfig, UserSession } from '@stacks/connect';
+import mainMenuMap from '../resources/world-map.png';
+import '../menu.css';
+import NavBar from './NavBar';
+import { NewScene } from './NewScene';
 import {
   fetchBalancesData,
   fetchMainOperationData,
   fetchTokenNameData,
   fetchTupleOperationData,
-} from "../utils/dataFetchingFuntions";
-import { PopupScene } from "./PopupScene";
-import {
-  itemsList,
-  itemTypeDictionary,
-  miningHarvestingSleepingTimes,
-} from "../constants/dataLists";
-import { baseImgUrl } from "../constants/baseImgUrl";
+} from '../utils/dataFetchingFuntions';
+import { PopupScene } from './PopupScene';
+import { itemsList, itemTypeDictionary, miningHarvestingSleepingTimes } from '../constants/dataLists';
+import { baseImgUrl } from '../constants/baseImgUrl';
+import { userAddress } from './ConnectWallet';
 
 export const MainMenu = () => {
-  const [operation, setOperation] = useState("");
-  const [menuPage, setMenuPage] = useState("MainMenu");
+  console.log(userAddress);
+  const [operation, setOperation] = useState('');
+  const [menuPage, setMenuPage] = useState('MainMenu');
   const [mainDataDictionary, setMainDataDictionary] = useState({});
-  const [selectedSword, setSelectedSword] = useState(
-    localStorage.getItem("selectedSword")
-  );
-  const [selectedArmor, setSelectedArmor] = useState(
-    localStorage.getItem("selectedArmor")
-  );
-  const [selectedHelmet, setSelectedHelmet] = useState(
-    localStorage.getItem("selectedHelmet")
-  );
-  const [selectedShield, setSelectedShield] = useState(
-    localStorage.getItem("selectedShield")
-  );
-  const [selectedShoes, setSelectedShoes] = useState(
-    localStorage.getItem("selectedShoes")
-  );
-  console.log(
-    selectedSword,
-    selectedArmor,
-    selectedHelmet,
-    selectedShield,
-    selectedShoes
-  );
-  const [selectedMiningItem, setSelectedMiningItem] = useState("");
-  const [selectedHarvestingItem, setSelectedHarvestingItem] = useState("");
-  const [selectedSleepingTime, setSelectedSleepingTime] = useState("");
-  const [selectedMiningTime, setSelectedMiningTime] = useState("");
-  const [selectedHarvestingTime, setSelectedHarvestingTime] = useState("");
+  const [selectedSword, setSelectedSword] = useState(localStorage.getItem('selectedSword'));
+  const [selectedArmor, setSelectedArmor] = useState(localStorage.getItem('selectedArmor'));
+  const [selectedHelmet, setSelectedHelmet] = useState(localStorage.getItem('selectedHelmet'));
+  const [selectedShield, setSelectedShield] = useState(localStorage.getItem('selectedShield'));
+  const [selectedShoes, setSelectedShoes] = useState(localStorage.getItem('selectedShoes'));
+  console.log(selectedSword, selectedArmor, selectedHelmet, selectedShield, selectedShoes);
+  const [selectedMiningItem, setSelectedMiningItem] = useState('');
+  const [selectedHarvestingItem, setSelectedHarvestingItem] = useState('');
+  const [selectedSleepingTime, setSelectedSleepingTime] = useState('');
+  const [selectedMiningTime, setSelectedMiningTime] = useState('');
+  const [selectedHarvestingTime, setSelectedHarvestingTime] = useState('');
   const [hasRespondedData, setHasRespondedData] = useState(false);
   const [operationData, setOperationData] = useState({
     itemsImages: {},
     attributes: {},
-    crafting: {},
-    "level-up": {},
-    acquisition: {},
-    sleeping: {},
-    fighting: {},
-    mining: {},
-    harvesting: {},
+    Craft: {},
+    LevelUp: {},
+    Shop: {},
+    Sleep: {},
+    Fight: {},
+    Mine: {},
+    Harvest: {},
   });
   const miningFunction = (time) => {
     setSelectedMiningTime(time);
-    setOperation("Mine");
-    setMenuPage("PopupScene");
+    setOperation('Mine');
+    setMenuPage('PopupScene');
   };
   const sleepingFunction = (time) => {
     setSelectedSleepingTime(time);
-    setOperation("Sleep");
-    setMenuPage("PopupScene");
+    setOperation('Sleep');
+    setMenuPage('PopupScene');
   };
   const shopFunction = () => {
-    setOperation("Shop");
-    setMenuPage("NewScene");
+    setOperation('Shop');
+    setMenuPage('NewScene');
   };
   const craftFunction = () => {
-    setOperation("Craft");
-    setMenuPage("NewScene");
+    setOperation('Craft');
+    setMenuPage('NewScene');
   };
   const levelUpFunction = () => {
-    setOperation("LevelUp");
-    setMenuPage("NewScene");
+    setOperation('LevelUp');
+    setMenuPage('NewScene');
   };
   const exploreFunction = () => {
-    setOperation("Exploring");
-    setMenuPage("PopupScene");
+    setOperation('Exploring');
+    setMenuPage('PopupScene');
   };
-  const lumberjackFunction = (time) => {
+  const harvestFunction = (time) => {
     setSelectedHarvestingTime(time);
-    setOperation("Lumberjack");
-    setMenuPage("PopupScene");
+    setOperation('Harvest');
+    setMenuPage('PopupScene');
   };
   const fightFunction = () => {
-    setOperation("Fight");
-    setMenuPage("NewScene");
+    setOperation('Fight');
+    setMenuPage('NewScene');
   };
 
   const fetchMainDictionary = useCallback(async () => {
@@ -107,43 +89,25 @@ export const MainMenu = () => {
       };
     });
 
-    mainDataDictionaryLocal["fighting-resources"] =
-      await fetchMainOperationData("fighting-resources");
+    mainDataDictionaryLocal['fighting-resources'] = await fetchMainOperationData('fighting-resources');
 
-    mainDataDictionaryLocal["fighting-rewards"] = await fetchMainOperationData(
-      "fighting-rewards"
-    );
+    mainDataDictionaryLocal['fighting-rewards'] = await fetchMainOperationData('fighting-rewards');
 
-    mainDataDictionaryLocal["level-up"] = await fetchMainOperationData(
-      "level-up"
-    );
+    mainDataDictionaryLocal['LevelUp'] = await fetchMainOperationData('LevelUp');
 
-    mainDataDictionaryLocal["crafting"] = await fetchMainOperationData(
-      "crafting"
-    );
+    mainDataDictionaryLocal['Craft'] = await fetchMainOperationData('Craft');
 
-    mainDataDictionaryLocal["acquisition"] = await fetchMainOperationData(
-      "acquisition"
-    );
+    mainDataDictionaryLocal['Shop'] = await fetchMainOperationData('Shop');
 
-    mainDataDictionaryLocal["sleeping"] = await fetchMainOperationData(
-      "sleeping"
-    );
+    mainDataDictionaryLocal['Sleep'] = await fetchMainOperationData('Sleep');
 
-    mainDataDictionaryLocal["mining"] = await fetchTupleOperationData("mining");
+    mainDataDictionaryLocal['Mine'] = await fetchTupleOperationData('Mine');
 
-    mainDataDictionaryLocal["harvesting"] = await fetchTupleOperationData(
-      "harvesting"
-    );
+    mainDataDictionaryLocal['Harvest'] = await fetchTupleOperationData('Harvest');
 
-    mainDataDictionaryLocal["token-name"] = await fetchTokenNameData(
-      "tokenName"
-    );
+    mainDataDictionaryLocal['token-name'] = await fetchTokenNameData('tokenName');
 
-    mainDataDictionaryLocal["balances"] = await fetchBalancesData(
-      "balances",
-      "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4"
-    );
+    mainDataDictionaryLocal['balances'] = await fetchBalancesData('balances', userAddress);
     console.log(mainDataDictionaryLocal);
     if (mainDataDictionaryLocal) {
       setMainDataDictionary(mainDataDictionaryLocal);
@@ -162,49 +126,32 @@ export const MainMenu = () => {
         {!hasRespondedData && <div>Loading...</div>}
         {hasRespondedData && (
           <div>
-            <NavBar
-              menuPage={menuPage}
-              setMenuPage={setMenuPage}
-              operation={operation}
-              setOperation={setOperation}
-            />
+            <NavBar menuPage={menuPage} setMenuPage={setMenuPage} operation={operation} setOperation={setOperation} />
             <div className="container-div">
-              <img
-                className="World-map-full"
-                src={mainMenuMap}
-                alt="worldMap"
-                useMap="#worldMap"
-              />
+              <img className="World-map-full" src={mainMenuMap} alt="worldMap" useMap="#worldMap" />
               <span className="mining-span">
                 <div className="tooltipTop">
                   <span className="tooltipTextTop">
                     <h3>Mine</h3>
-                    Here you can mine in order to collect resources. You can
-                    mine using:
+                    Here you can mine in order to collect resources. You can mine using:
                     <br></br>
-                    {mainDataDictionary["itemsImages"] &&
+                    {mainDataDictionary['itemsImages'] &&
                       itemTypeDictionary.pickaxe.map((pickaxe) => {
-                        if (
-                          parseInt(mainDataDictionary["balances"][pickaxe]) > 0
-                        )
+                        if (parseInt(mainDataDictionary['balances'][pickaxe]) > 0)
                           return (
                             <div
                               key={pickaxe}
                               className="img-container-new-scene"
-                              onClick={() =>
-                                setSelectedMiningItem(pickaxe.toString())
-                              }
+                              onClick={() => setSelectedMiningItem(pickaxe.toString())}
                             >
                               <figure>
                                 <img
-                                  src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary["itemsImages"][pickaxe]}`}
+                                  src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][pickaxe]}`}
                                   key={pickaxe}
                                 ></img>
                                 <figcaption>
-                                  {mainDataDictionary["token-name"] &&
-                                    mainDataDictionary["token-name"][
-                                      pickaxe
-                                    ].name.replaceAll("_", " ")}
+                                  {mainDataDictionary['token-name'] &&
+                                    mainDataDictionary['token-name'][pickaxe].name.replaceAll('_', ' ')}
                                 </figcaption>
                               </figure>
                             </div>
@@ -214,60 +161,48 @@ export const MainMenu = () => {
                             <div
                               key={pickaxe}
                               className="img-container-new-scene-no-balance"
-                              onClick={() =>
-                                setSelectedMiningItem(pickaxe.toString())
-                              }
+                              onClick={() => setSelectedMiningItem(pickaxe.toString())}
                             >
                               <figure>
                                 <img
-                                  src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary["itemsImages"][pickaxe]}`}
+                                  src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][pickaxe]}`}
                                   key={pickaxe}
                                 ></img>
                                 <figcaption>
-                                  {mainDataDictionary["token-name"] &&
-                                    mainDataDictionary["token-name"][
-                                      pickaxe
-                                    ].name.replaceAll("_", " ")}
+                                  {mainDataDictionary['token-name'] &&
+                                    mainDataDictionary['token-name'][pickaxe].name.replaceAll('_', ' ')}
                                 </figcaption>
                               </figure>
                             </div>
                           );
                       })}
-                    {parseInt(
-                      mainDataDictionary["balances"][selectedMiningItem]
-                    ) == 0 &&
+                    {parseInt(mainDataDictionary['balances'][selectedMiningItem]) == 0 &&
                       miningHarvestingSleepingTimes.map((time) => {
                         return (
-                          <div className="tooltipChild">
+                          <div className="tooltipChild" key={`Mine${time}`}>
                             {time} minutes
                             <span className="tooltipTextChild ">
-                              {mainDataDictionary["mining"] &&
-                                selectedMiningItem != "" &&
-                                Object.keys(
-                                  mainDataDictionary["mining"][
-                                    selectedMiningItem
-                                  ][time]
-                                ).map((rewardSet) => {
+                              {mainDataDictionary['Mine'] &&
+                                selectedMiningItem != '' &&
+                                Object.keys(mainDataDictionary['Mine'][selectedMiningItem][time]).map((rewardSet) => {
                                   return (
-                                    <div className="img-container-new-scene">
+                                    <div className="img-container-new-scene" key={`MineReward${rewardSet}`}>
                                       <figure>
                                         <img
-                                          width={"20px"}
+                                          width={'20px'}
                                           src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                            mainDataDictionary["itemsImages"][
-                                              mainDataDictionary["mining"][
-                                                selectedMiningItem
-                                              ][time][rewardSet]["resource-id"]
-                                                .value
+                                            mainDataDictionary['itemsImages'][
+                                              mainDataDictionary['Mine'][selectedMiningItem][time][rewardSet][
+                                                'resource-id'
+                                              ].value
                                             ]
                                           }`}
                                         ></img>
                                         <figcaption>
                                           {
-                                            mainDataDictionary["mining"][
-                                              selectedMiningItem
-                                            ][time][rewardSet]["resource-qty"]
-                                              .value
+                                            mainDataDictionary['Mine'][selectedMiningItem][time][rewardSet][
+                                              'resource-qty'
+                                            ].value
                                           }
                                         </figcaption>
                                       </figure>
@@ -278,44 +213,33 @@ export const MainMenu = () => {
                           </div>
                         );
                       })}
-                    {parseInt(
-                      mainDataDictionary["balances"][selectedMiningItem]
-                    ) > 0 &&
+                    {parseInt(mainDataDictionary['balances'][selectedMiningItem]) > 0 &&
                       miningHarvestingSleepingTimes.map((time) => {
                         return (
-                          <div
-                            className="tooltipChild"
-                            onClick={() => miningFunction(time)}
-                          >
+                          <div className="tooltipChild" key={`MineReward${time}`} onClick={() => miningFunction(time)}>
                             {time} minutes
                             <span className="tooltipTextChild ">
-                              {mainDataDictionary["mining"] &&
-                                selectedMiningItem != "" &&
-                                Object.keys(
-                                  mainDataDictionary["mining"][
-                                    selectedMiningItem
-                                  ][time]
-                                ).map((rewardSet) => {
+                              {mainDataDictionary['Mine'] &&
+                                selectedMiningItem != '' &&
+                                Object.keys(mainDataDictionary['Mine'][selectedMiningItem][time]).map((rewardSet) => {
                                   return (
-                                    <div className="img-container-new-scene">
+                                    <div className="img-container-new-scene" key={`MineReward${rewardSet}`}>
                                       <figure>
                                         <img
-                                          width={"20px"}
+                                          width={'20px'}
                                           src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                            mainDataDictionary["itemsImages"][
-                                              mainDataDictionary["mining"][
-                                                selectedMiningItem
-                                              ][time][rewardSet]["resource-id"]
-                                                .value
+                                            mainDataDictionary['itemsImages'][
+                                              mainDataDictionary['Mine'][selectedMiningItem][time][rewardSet][
+                                                'resource-id'
+                                              ].value
                                             ]
                                           }`}
                                         ></img>
                                         <figcaption>
                                           {
-                                            mainDataDictionary["mining"][
-                                              selectedMiningItem
-                                            ][time][rewardSet]["resource-qty"]
-                                              .value
+                                            mainDataDictionary['Mine'][selectedMiningItem][time][rewardSet][
+                                              'resource-qty'
+                                            ].value
                                           }
                                         </figcaption>
                                       </figure>
@@ -333,40 +257,28 @@ export const MainMenu = () => {
                 <div className="tooltipTop">
                   <span className="tooltipTextTop">
                     <h3>Your Home</h3>
-                    Here you can rest in order to restore energy. You can sleep
-                    for:
+                    Here you can rest in order to restore energy. You can sleep for:
                     <br />
                     {miningHarvestingSleepingTimes.map((time) => {
                       return (
-                        <div
-                          className="tooltipChild"
-                          onClick={() => sleepingFunction(time)}
-                        >
+                        <div className="tooltipChild" key={`Sleep${time}`} onClick={() => sleepingFunction(time)}>
                           {time} minutes
                           <span className="tooltipTextChild ">
-                            {mainDataDictionary["sleeping"] &&
-                              Object.keys(
-                                mainDataDictionary["sleeping"][time]
-                              ).map((rewardSet) => {
+                            {mainDataDictionary['Sleep'] &&
+                              Object.keys(mainDataDictionary['Sleep'][time]).map((rewardSet) => {
                                 return (
-                                  <div className="img-container-new-scene">
+                                  <div className="img-container-new-scene" key={`SleepReward${time}`}>
                                     <figure>
                                       <img
-                                        width={"20px"}
+                                        width={'20px'}
                                         src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                          mainDataDictionary["itemsImages"][
-                                            mainDataDictionary["sleeping"][
-                                              time
-                                            ][rewardSet]["resource-id"].value
+                                          mainDataDictionary['itemsImages'][
+                                            mainDataDictionary['Sleep'][time][rewardSet]['resource-id'].value
                                           ]
                                         }`}
                                       ></img>
                                       <figcaption>
-                                        {
-                                          mainDataDictionary["sleeping"][time][
-                                            rewardSet
-                                          ]["resource-qty"].value
-                                        }
+                                        {mainDataDictionary['Sleep'][time][rewardSet]['resource-qty'].value}
                                       </figcaption>
                                     </figure>
                                   </div>
@@ -421,27 +333,23 @@ export const MainMenu = () => {
                     <h3>Forest</h3>
                     Here you can cut trees in order to collect wood, using:
                     <br />
-                    {mainDataDictionary["itemsImages"] &&
+                    {mainDataDictionary['itemsImages'] &&
                       itemTypeDictionary.axe.map((axe) => {
-                        if (parseInt(mainDataDictionary["balances"][axe]) > 0)
+                        if (parseInt(mainDataDictionary['balances'][axe]) > 0)
                           return (
                             <div
                               key={axe}
                               className="img-container-new-scene"
-                              onClick={() =>
-                                setSelectedHarvestingItem(axe.toString())
-                              }
+                              onClick={() => setSelectedHarvestingItem(axe.toString())}
                             >
                               <figure>
                                 <img
-                                  src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary["itemsImages"][axe]}`}
+                                  src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][axe]}`}
                                   key={axe}
                                 ></img>
                                 <figcaption>
-                                  {mainDataDictionary["token-name"] &&
-                                    mainDataDictionary["token-name"][
-                                      axe
-                                    ].name.replaceAll("_", " ")}
+                                  {mainDataDictionary['token-name'] &&
+                                    mainDataDictionary['token-name'][axe].name.replaceAll('_', ' ')}
                                 </figcaption>
                               </figure>
                             </div>
@@ -451,115 +359,96 @@ export const MainMenu = () => {
                             <div
                               key={axe}
                               className="img-container-new-scene-no-balance"
-                              onClick={() =>
-                                setSelectedHarvestingItem(axe.toString())
-                              }
+                              onClick={() => setSelectedHarvestingItem(axe.toString())}
                             >
                               <figure>
                                 <img
-                                  src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary["itemsImages"][axe]}`}
+                                  src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][axe]}`}
                                   key={axe}
                                 ></img>
                                 <figcaption>
-                                  {mainDataDictionary["token-name"] &&
-                                    mainDataDictionary["token-name"][
-                                      axe
-                                    ].name.replaceAll("_", " ")}
+                                  {mainDataDictionary['token-name'] &&
+                                    mainDataDictionary['token-name'][axe].name.replaceAll('_', ' ')}
                                 </figcaption>
                               </figure>
                             </div>
                           );
                       })}
-                    {parseInt(
-                      mainDataDictionary["balances"][selectedHarvestingItem]
-                    ) > 0 &&
+                    {parseInt(mainDataDictionary['balances'][selectedHarvestingItem]) > 0 &&
                       miningHarvestingSleepingTimes.map((time) => {
                         return (
-                          <div
-                            className="tooltipChild"
-                            onClick={() => lumberjackFunction(time)}
-                          >
+                          <div className="tooltipChild" key={`Harvest${time}`} onClick={() => harvestFunction(time)}>
                             {time} minutes
                             <span className="tooltipTextChild ">
-                              {mainDataDictionary["mining"] &&
-                                selectedHarvestingItem != "" &&
-                                Object.keys(
-                                  mainDataDictionary["harvesting"][
-                                    selectedHarvestingItem
-                                  ][time]
-                                ).map((rewardSet) => {
-                                  console.log(rewardSet);
-                                  return (
-                                    <div className="img-container-new-scene">
-                                      <figure>
-                                        <img
-                                          width={"20px"}
-                                          src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                            mainDataDictionary["itemsImages"][
-                                              mainDataDictionary["harvesting"][
-                                                selectedHarvestingItem
-                                              ][time][rewardSet]["resource-id"]
-                                                .value
-                                            ]
-                                          }`}
-                                        ></img>
-                                        <figcaption>
-                                          {
-                                            mainDataDictionary["harvesting"][
-                                              selectedHarvestingItem
-                                            ][time][rewardSet]["resource-qty"]
-                                              .value
-                                          }
-                                        </figcaption>
-                                      </figure>
-                                    </div>
-                                  );
-                                })}
+                              {mainDataDictionary['Mine'] &&
+                                selectedHarvestingItem != '' &&
+                                Object.keys(mainDataDictionary['Harvest'][selectedHarvestingItem][time]).map(
+                                  (rewardSet) => {
+                                    console.log(rewardSet);
+                                    return (
+                                      <div className="img-container-new-scene" key={`HarvestReward${rewardSet}`}>
+                                        <figure>
+                                          <img
+                                            width={'20px'}
+                                            src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                                              mainDataDictionary['itemsImages'][
+                                                mainDataDictionary['Harvest'][selectedHarvestingItem][time][rewardSet][
+                                                  'resource-id'
+                                                ].value
+                                              ]
+                                            }`}
+                                          ></img>
+                                          <figcaption>
+                                            {
+                                              mainDataDictionary['Harvest'][selectedHarvestingItem][time][rewardSet][
+                                                'resource-qty'
+                                              ].value
+                                            }
+                                          </figcaption>
+                                        </figure>
+                                      </div>
+                                    );
+                                  }
+                                )}
                             </span>
                           </div>
                         );
                       })}
-                    {parseInt(
-                      mainDataDictionary["balances"][selectedHarvestingItem]
-                    ) == 0 &&
+                    {parseInt(mainDataDictionary['balances'][selectedHarvestingItem]) == 0 &&
                       miningHarvestingSleepingTimes.map((time) => {
                         return (
-                          <div className="tooltipChild">
+                          <div className="tooltipChild" key={`Harvest${time}`}>
                             {time} minutes
                             <span className="tooltipTextChild ">
-                              {mainDataDictionary["mining"] &&
-                                selectedHarvestingItem != "" &&
-                                Object.keys(
-                                  mainDataDictionary["harvesting"][
-                                    selectedHarvestingItem
-                                  ][time]
-                                ).map((rewardSet) => {
-                                  return (
-                                    <div className="img-container-new-scene">
-                                      <figure>
-                                        <img
-                                          width={"20px"}
-                                          src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                            mainDataDictionary["itemsImages"][
-                                              mainDataDictionary["harvesting"][
-                                                selectedHarvestingItem
-                                              ][time][rewardSet]["resource-id"]
-                                                .value
-                                            ]
-                                          }`}
-                                        ></img>
-                                        <figcaption>
-                                          {
-                                            mainDataDictionary["harvesting"][
-                                              selectedHarvestingItem
-                                            ][time][rewardSet]["resource-qty"]
-                                              .value
-                                          }
-                                        </figcaption>
-                                      </figure>
-                                    </div>
-                                  );
-                                })}
+                              {mainDataDictionary['Mine'] &&
+                                selectedHarvestingItem != '' &&
+                                Object.keys(mainDataDictionary['Harvest'][selectedHarvestingItem][time]).map(
+                                  (rewardSet) => {
+                                    return (
+                                      <div className="img-container-new-scene" key={`HarvestReward${rewardSet}`}>
+                                        <figure>
+                                          <img
+                                            width={'20px'}
+                                            src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                                              mainDataDictionary['itemsImages'][
+                                                mainDataDictionary['Harvest'][selectedHarvestingItem][time][rewardSet][
+                                                  'resource-id'
+                                                ].value
+                                              ]
+                                            }`}
+                                          ></img>
+                                          <figcaption>
+                                            {
+                                              mainDataDictionary['Harvest'][selectedHarvestingItem][time][rewardSet][
+                                                'resource-qty'
+                                              ].value
+                                            }
+                                          </figcaption>
+                                        </figure>
+                                      </div>
+                                    );
+                                  }
+                                )}
                             </span>
                           </div>
                         );
@@ -591,19 +480,9 @@ export const MainMenu = () => {
     ),
     PopupScene: (
       <div className="fullscreen-div">
-        <NavBar
-          menuPage={menuPage}
-          setMenuPage={setMenuPage}
-          operation={operation}
-          setOperation={setOperation}
-        />
+        <NavBar menuPage={menuPage} setMenuPage={setMenuPage} operation={operation} setOperation={setOperation} />
         <div className="container-div">
-          <img
-            className="World-map-full-transparent"
-            src={mainMenuMap}
-            alt="worldMap"
-            useMap="#worldMap"
-          />
+          <img className="World-map-full-transparent" src={mainMenuMap} alt="worldMap" useMap="#worldMap" />
           <PopupScene
             menuPage={menuPage}
             setMenuPage={setMenuPage}
@@ -620,12 +499,7 @@ export const MainMenu = () => {
     ),
     NewScene: (
       <div className="fullscreen-div">
-        <NavBar
-          menuPage={menuPage}
-          setMenuPage={setMenuPage}
-          operation={operation}
-          setOperation={setOperation}
-        />
+        <NavBar menuPage={menuPage} setMenuPage={setMenuPage} operation={operation} setOperation={setOperation} />
         <NewScene
           menuPage={menuPage}
           mainDataDictionary={mainDataDictionary}

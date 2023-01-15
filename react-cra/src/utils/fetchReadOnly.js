@@ -1,17 +1,10 @@
-import {
-  cvToHex,
-  cvToJSON,
-  hexToCV,
-  stringAsciiCV,
-  tupleCV,
-  uintCV,
-} from "@stacks/transactions";
-import types from "@testing-library/user-event";
-import { userSession } from "../components/ConnectWallet";
-import { network } from "../constants/network";
-import { listCV, intCV } from "@stacks/transactions";
-import { intToHexString } from "./convert";
-import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
+import { cvToHex, cvToJSON, hexToCV, stringAsciiCV, tupleCV, uintCV } from '@stacks/transactions';
+import types from '@testing-library/user-event';
+import { userAddress, userSession } from '../components/ConnectWallet';
+import { network } from '../constants/network';
+import { listCV, intCV } from '@stacks/transactions';
+import { intToHexString } from './convert';
+import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
 
 export const fetchReadOnlySimple = async (requestUrl, requestList) => {
   let convertedList = [];
@@ -20,10 +13,10 @@ export const fetchReadOnlySimple = async (requestUrl, requestList) => {
   });
 
   const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      sender: "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4",
+      sender: userAddress,
       //userSession.loadUserData().profile.stxAddress.devnet, // todo: check this
       network: network,
       arguments: [cvToHex(listCV(convertedList))],
@@ -35,27 +28,20 @@ export const fetchReadOnlySimple = async (requestUrl, requestList) => {
   return await returnedData;
 };
 
-export const fetchReadOnlyBalances = async (
-  requestUrl,
-  requestList,
-  userAddress
-) => {
+export const fetchReadOnlyBalances = async (requestUrl, requestList, userAddress) => {
   let convertedList = [];
   requestList.forEach((element) => {
     convertedList.push(uintCV(element));
   });
 
   const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      sender: "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4", // userAddress
+      sender: userAddress, // userAddress
       //userSession.loadUserData().profile.stxAddress.devnet, // todo: check this
       network: network,
-      arguments: [
-        cvToHex(principalCV(userAddress)),
-        cvToHex(listCV(convertedList)),
-      ],
+      arguments: [cvToHex(principalCV(userAddress)), cvToHex(listCV(convertedList))],
     }),
   };
   let returnedData = await fetch(requestUrl, requestOptions)
@@ -70,17 +56,17 @@ export const fetchReadOnlyMining = async (requestUrl, operationList) => {
   let dict;
   operationList.forEach((element) => {
     dict = {
-      "token-id": uintCV(element[0]),
-      "mining-time": uintCV(element[1]),
+      'token-id': uintCV(element[0]),
+      'mining-time': uintCV(element[1]),
     };
     dict = tupleCV(dict);
     convertedList.push(dict);
   });
   const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      sender: "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4",
+      sender: userAddress,
       //userSession.loadUserData().profile.stxAddress.devnet, // todo: check this
       network: network,
       arguments: [cvToHex(listCV(convertedList))],
@@ -98,17 +84,17 @@ export const fetchReadOnlyHarvesting = async (requestUrl, operationList) => {
   let dict;
   operationList.forEach((element) => {
     dict = {
-      "token-id": uintCV(element[0]),
-      "harvesting-time": uintCV(element[1]),
+      'token-id': uintCV(element[0]),
+      'harvesting-time': uintCV(element[1]),
     };
     dict = tupleCV(dict);
     convertedList.push(dict);
   });
   const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      sender: "ST2FGK1JPBZ25SXCV7Y3F9B5RTW9EB5R4VRY45YX4",
+      sender: userAddress,
       //userSession.loadUserData().profile.stxAddress.devnet, // todo: check this
       network: network,
       arguments: [cvToHex(listCV(convertedList))],

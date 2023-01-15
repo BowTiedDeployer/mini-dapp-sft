@@ -208,6 +208,42 @@
   visibility: visible;
   display: inline-block;
 }
+.tooltipTopInventory {
+  display: inline;
+  align-content: center;
+  align-items: center;
+  position: relative;
+  width: 100px;
+  /* height: 100%; */
+  /* display: inline-block; */
+  /* border: 2px dotted green; */
+}
+.tooltipTopInventory .tooltipTextTopInventory {
+  visibility: hidden;
+  display: none;
+
+  width: 200px;
+  background-color: burlywood;
+  color: black;
+  text-align: center;
+  border: 2px;
+  border-style: solid;
+  border-color: #000;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1080;
+  top: 100%;
+  left: 52%;
+  /* left: 60%; */
+  margin-left: -100px;
+}
+.tooltipTopInventory:hover .tooltipTextTopInventory {
+  visibility: visible;
+  display: inline-block;
+}
 .popup {
   position: fixed;
   top: 25%;
@@ -305,4 +341,8 @@ li {
   position: relative;
   width: 100%;
   z-index: 1;
+}
+
+li {
+  display: inline;
 }

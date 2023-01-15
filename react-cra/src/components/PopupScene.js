@@ -1,4 +1,4 @@
-import React, { createElement } from "react";
+import React, { createElement } from 'react';
 
 // Title
 // Text message
@@ -26,7 +26,7 @@ export const PopupScene = (props) => {
       clearInterval(interval);
       intervals = [];
     });
-    setMenuPage("MainMenu");
+    setMenuPage('MainMenu');
   };
 
   const addMinutes = (date, minutes) => {
@@ -37,13 +37,15 @@ export const PopupScene = (props) => {
 
   const timer = (operation) => {
     let operationSelectedTime = 0;
+    document.getElementById(`start${operation}`)?.setAttribute('disabled', 'disabled');
+    document.getElementById(`navbarBrand`)?.setAttribute('disabled', 'disabled');
+    document.getElementById(`navbarInventory`)?.setAttribute('disabled', 'disabled');
 
     // choosing the right time based on the selected operation
 
-    if (operation == "Harvesting")
-      operationSelectedTime = selectedHarvestingTime;
-    else if (operation == "Mining") operationSelectedTime = selectedMiningTime;
-    else if (operation == "Sleeping") {
+    if (operation == 'Harvest') operationSelectedTime = selectedHarvestingTime;
+    else if (operation == 'Mine') operationSelectedTime = selectedMiningTime;
+    else if (operation == 'Sleep') {
       console.log(operation);
       operationSelectedTime = selectedSleepingTime;
     }
@@ -56,21 +58,26 @@ export const PopupScene = (props) => {
     // setting an interval
 
     let x = setInterval(function () {
-      console.log("interval");
+      console.log('interval');
       let now = new Date().getTime();
       let distance = endTime - now;
       let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       let seconds = Math.floor((distance % (1000 * 60)) / 1000);
       if (document.getElementById(`timer${operation}`) != null) {
-        document.getElementById(
-          `timer${operation}`
-        ).innerHTML = `${minutes}:${seconds}`;
+        document.getElementById(`timer${operation}`).innerHTML =
+          minutes > 9 && seconds > 9
+            ? `${minutes}:${seconds}`
+            : minutes <= 9 && seconds > 9
+            ? `0${minutes}:${seconds}`
+            : minutes > 9 && seconds <= 9
+            ? `${minutes}:0${seconds}`
+            : `0${minutes}:0${seconds}`;
       }
       if (distance < 0) {
         document.getElementById(`timer${operation}`).innerHTML = null;
         clearInterval(x);
         if (document.getElementById(`timer${operation}`) != null) {
-          let claimBtn = document.createElement("button");
+          let claimBtn = document.createElement('button');
           claimBtn.innerHTML = `Claim rewards!`;
           document.getElementById(`timer${operation}`)?.appendChild(claimBtn);
         }
@@ -87,29 +94,29 @@ export const PopupScene = (props) => {
         <br></br>
         Mine for {selectedMiningTime} minutes using<br></br>
         {selectedMiningItem &&
-          mainDataDictionary["token-name"][
-            selectedMiningItem.toString()
-          ].name.replaceAll("_", " ")}
+          mainDataDictionary['token-name'][selectedMiningItem.toString()].name.replaceAll('_', ' ')}
         <br></br>! <br></br>
-        <button onClick={() => timer("Mining")}>Start mining</button>
+        <button id="startMine" onClick={() => timer(operation)}>
+          Start mining
+        </button>
         <br></br>
         <br></br>
-        <div id="timerMining"></div>
+        <div id="timerMine"></div>
       </div>
     ),
-    Lumberjack: (
+    Harvest: (
       <div>
         {operation} <br></br>
         Forest for {selectedHarvestingTime} minutes using<br></br>
         {selectedHarvestingItem &&
-          mainDataDictionary["token-name"][
-            selectedHarvestingItem.toString()
-          ].name.replaceAll("_", " ")}
+          mainDataDictionary['token-name'][selectedHarvestingItem.toString()].name.replaceAll('_', ' ')}
         ! <br></br>
-        <button onClick={() => timer("Harvesting")}>Start harvesting</button>
+        <button id="startHarvest" onClick={() => timer(operation)}>
+          Start harvesting
+        </button>
         <br></br>
         <br></br>
-        <div id="timerHarvesting"></div>
+        <div id="timerHarvest"></div>
       </div>
     ),
     Sleep: (
@@ -117,10 +124,12 @@ export const PopupScene = (props) => {
         {operation} <br></br>
         Sleep for {selectedSleepingTime} minutes!
         <br></br>
-        <button onClick={() => timer("Sleeping")}>Start sleeping</button>
+        <button id="startSleep" onClick={() => timer(operation)}>
+          Start sleeping
+        </button>
         <br></br>
         <br></br>
-        <div id="timerSleeping"></div>
+        <div id="timerSleep"></div>
       </div>
     ),
   };
