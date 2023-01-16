@@ -1,23 +1,23 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./index.css";
-import { App } from "./App";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import { App } from './App';
 
-import { Connect } from "@stacks/connect-react";
+import { Connect } from '@stacks/connect-react';
 
-import { userSession } from "./components/ConnectWallet";
+import { userSession } from './components/ConnectWallet';
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Connect
       authOptions={{
         appDetails: {
-          name: "Stacks React Template",
+          name: 'Stacks React Template',
           // todo:
-          icon: window.location.origin + "/logo.png",
+          icon: window.location.origin + '/logo.png',
         },
-        redirectTo: "/",
+        redirectTo: '/',
         onFinish: () => {
           window.location.reload();
         },
