@@ -1,6 +1,6 @@
 import React from 'react';
 import { userSession } from './ConnectWallet';
-import { serverUrl } from '../constants/network';
+import { network, serverUrl } from '../constants/network';
 
 // Title
 // Text message
@@ -112,17 +112,18 @@ export const PopupScene = (props) => {
           mainDataDictionary['token-name'][selectedMiningItem.toString()].name.replaceAll('_', ' ')}
         <br></br>! <br></br>
         {/* TODO: move to claim button */}
-        <button id="startMine"
+        <button
+          id="startMine"
           onClick={() =>
             postCall(
-              `${serverUrl}/rewarding-mining`,
+              `${serverUrl[network]}/rewarding-mining`,
               userSession.loadUserData().profile.stxAddress['testnet'],
               selectedMiningTime,
               selectedMiningItem
             )
           }
         >
-        {/* onClick={() => timer(operation)} */}
+          {/* onClick={() => timer(operation)} */}
           Start mining
         </button>
         <br></br>
@@ -151,16 +152,17 @@ export const PopupScene = (props) => {
         Sleep for {selectedSleepingTime} minutes!
         <br></br>
         {/* TODO: move to claim button */}
-        <button id="startSleep" 
+        <button
+          id="startSleep"
           onClick={() =>
             postCall(
-              `${serverUrl}/rewarding-sleeping`,
+              `${serverUrl[network]}/rewarding-sleeping`,
               userSession.loadUserData().profile.stxAddress['testnet'],
               selectedSleepingTime
             )
           }
-        >        
-        {/* onClick={() => timer(operation)} */}
+        >
+          {/* onClick={() => timer(operation)} */}
           Start sleeping
         </button>
         <br></br>
