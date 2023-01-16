@@ -53,7 +53,7 @@ app.get('/', (req, res) => {
 
 app.post('/rewarding-mining', async (req, res) => {
   try {
-    const token_id = req.body.pickaxe_id;
+    const token_id = req.body.token_id;
     const mininng_time = req.body.time;
     const address = req.body.address;
 

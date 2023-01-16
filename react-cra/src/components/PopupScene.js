@@ -1,4 +1,6 @@
-import React from "react";
+import React from 'react';
+import { userSession } from './ConnectWallet';
+import { serverUrl } from '../constants/network';
 
 // Title
 // Text message
@@ -7,6 +9,19 @@ import React from "react";
 // main start button
 // after clicking start button -> time remaining
 // when time remaining == 0 -> claim rewards calling backend (POST call: function name, time)
+const postCall = async (requestUrl, address, time, token_id = null) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      address: address,
+      token_id: 2,
+      time: 5,
+    }),
+  };
+  let returnedData = await fetch(requestUrl, requestOptions).then((response) => response.json());
+  return await returnedData;
+};
 
 export const PopupScene = (props) => {
   const {
@@ -22,7 +37,7 @@ export const PopupScene = (props) => {
   } = props;
   console.log(mainDataDictionary);
   const onClickBack = () => {
-    setMenuPage("MainMenu");
+    setMenuPage('MainMenu');
   };
 
   const popupSceneMapping = {
@@ -32,11 +47,21 @@ export const PopupScene = (props) => {
         <br></br>
         Mine for {selectedMiningTime} minutes using<br></br>
         {selectedMiningItem &&
-          mainDataDictionary["token-name"][
-            selectedMiningItem.toString()
-          ].name.replaceAll("_", " ")}
+          mainDataDictionary['token-name'][selectedMiningItem.toString()].name.replaceAll('_', ' ')}
         <br></br>! <br></br>
-        <button>Start mining</button>
+        {/* TODO: move to claim button */}
+        <button
+          onClick={() =>
+            postCall(
+              `${serverUrl}/rewarding-mining`,
+              userSession.loadUserData().profile.stxAddress['testnet'],
+              selectedMiningTime,
+              selectedMiningItem
+            )
+          }
+        >
+          Start mining
+        </button>
       </div>
     ),
     Lumberjack: (
@@ -44,9 +69,7 @@ export const PopupScene = (props) => {
         {operation} <br></br>
         Forest for {selectedHarvestingTime} minutes using<br></br>
         {selectedHarvestingItem &&
-          mainDataDictionary["token-name"][
-            selectedHarvestingItem.toString()
-          ].name.replaceAll("_", " ")}
+          mainDataDictionary['token-name'][selectedHarvestingItem.toString()].name.replaceAll('_', ' ')}
         ! <br></br>
         <button>Start harvesting</button>
       </div>
@@ -56,7 +79,18 @@ export const PopupScene = (props) => {
         {operation} <br></br>
         Sleep for {selectedSleepingTime} minutes!
         <br></br>
-        <button>Start sleeping</button>
+        {/* TODO: move to claim button */}
+        <button
+          onClick={() =>
+            postCall(
+              `${serverUrl}/rewarding-sleeping`,
+              userSession.loadUserData().profile.stxAddress['testnet'],
+              selectedSleepingTime
+            )
+          }
+        >
+          Start sleeping
+        </button>
       </div>
     ),
   };
