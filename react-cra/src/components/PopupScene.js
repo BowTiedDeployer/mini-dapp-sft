@@ -1,4 +1,6 @@
-import React, { createElement } from 'react';
+import React from 'react';
+import { userSession } from './ConnectWallet';
+import { serverUrl } from '../constants/network';
 
 // Title
 // Text message
@@ -7,6 +9,19 @@ import React, { createElement } from 'react';
 // main start button
 // after clicking start button -> time remaining
 // when time remaining == 0 -> claim rewards calling backend (POST call: function name, time)
+const postCall = async (requestUrl, address, time, token_id = null) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      address: address,
+      token_id: 2,
+      time: 5,
+    }),
+  };
+  let returnedData = await fetch(requestUrl, requestOptions).then((response) => response.json());
+  return await returnedData;
+};
 
 export const PopupScene = (props) => {
   const {
@@ -96,7 +111,18 @@ export const PopupScene = (props) => {
         {selectedMiningItem &&
           mainDataDictionary['token-name'][selectedMiningItem.toString()].name.replaceAll('_', ' ')}
         <br></br>! <br></br>
-        <button id="startMine" onClick={() => timer(operation)}>
+        {/* TODO: move to claim button */}
+        <button id="startMine"
+          onClick={() =>
+            postCall(
+              `${serverUrl}/rewarding-mining`,
+              userSession.loadUserData().profile.stxAddress['testnet'],
+              selectedMiningTime,
+              selectedMiningItem
+            )
+          }
+        >
+        {/* onClick={() => timer(operation)} */}
           Start mining
         </button>
         <br></br>
@@ -124,7 +150,17 @@ export const PopupScene = (props) => {
         {operation} <br></br>
         Sleep for {selectedSleepingTime} minutes!
         <br></br>
-        <button id="startSleep" onClick={() => timer(operation)}>
+        {/* TODO: move to claim button */}
+        <button id="startSleep" 
+          onClick={() =>
+            postCall(
+              `${serverUrl}/rewarding-sleeping`,
+              userSession.loadUserData().profile.stxAddress['testnet'],
+              selectedSleepingTime
+            )
+          }
+        >        
+        {/* onClick={() => timer(operation)} */}
           Start sleeping
         </button>
         <br></br>
