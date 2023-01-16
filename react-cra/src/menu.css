@@ -271,6 +271,33 @@
   right: 16px;
 }
 
+.popup-sk {
+  position: fixed;
+  top: 37.5%;
+  left: 37.5%;
+  width: 25%;
+  height: 35vh;
+  background-color: burlywood;
+
+  opacity: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+.popup-sk-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 10%;
+  background-color: burlywood;
+}
+.popup-sk-inner .close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
 .close-btn {
   position: absolute;
   top: 70px;

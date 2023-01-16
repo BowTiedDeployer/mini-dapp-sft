@@ -50,6 +50,23 @@ export const fetchReadOnlyBalances = async (requestUrl, requestList, userAddress
   return await returnedData;
 };
 
+export const fetchReadOnlyStatus = async (requestUrl, userAddress) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sender: userAddress,
+      network: network,
+      arguments: [cvToHex(principalCV(userAddress))],
+    }),
+  };
+
+  let returnedData = await fetch(requestUrl, requestOptions)
+    .then((response) => response.json())
+    .then((data) => cvToJSON(hexToCV(data.result)));
+  return await returnedData;
+};
+
 export const fetchReadOnlyMining = async (requestUrl, operationList) => {
   let convertedList = [];
 

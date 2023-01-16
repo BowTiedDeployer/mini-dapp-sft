@@ -9,4 +9,5 @@ export const functionName = {
   LevelUp: 'level-up',
   Craft: 'craft-item',
   Shop: 'buy-item',
+  ClaimStarterKit: 'claim-starter-kit',
 };

@@ -7,6 +7,7 @@ import { NewScene } from './NewScene';
 import {
   fetchBalancesData,
   fetchMainOperationData,
+  fetchStatusData,
   fetchTokenNameData,
   fetchTupleOperationData,
 } from '../utils/dataFetchingFuntions';
@@ -14,6 +15,15 @@ import { PopupScene } from './PopupScene';
 import { itemsList, itemTypeDictionary, miningHarvestingSleepingTimes } from '../constants/dataLists';
 import { baseImgUrl } from '../constants/baseImgUrl';
 import { userAddress } from './ConnectWallet';
+import { network } from '../constants/network';
+import { StacksMainnet, StacksMocknet, StacksTestnet } from '@stacks/network';
+import { useConnect } from '@stacks/connect-react';
+import { contractAddress, contractName, functionName } from '../constants/contract';
+import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
+import { dataFunctionNames } from '../constants/dataFunctionNames';
+
+export const activeNetwork =
+  network === 'mainnet' ? new StacksMainnet() : network === 'testnet' ? new StacksTestnet() : new StacksMocknet();
 
 export const MainMenu = () => {
   console.log(userAddress);
@@ -32,17 +42,8 @@ export const MainMenu = () => {
   const [selectedMiningTime, setSelectedMiningTime] = useState('');
   const [selectedHarvestingTime, setSelectedHarvestingTime] = useState('');
   const [hasRespondedData, setHasRespondedData] = useState(false);
-  const [operationData, setOperationData] = useState({
-    itemsImages: {},
-    attributes: {},
-    Craft: {},
-    LevelUp: {},
-    Shop: {},
-    Sleep: {},
-    Fight: {},
-    Mine: {},
-    Harvest: {},
-  });
+  const [closedStarterKitPopup, setClosedStarterKitPopup] = useState(false);
+  const { doContractCall } = useConnect();
   const miningFunction = (time) => {
     setSelectedMiningTime(time);
     setOperation('Mine');
@@ -78,6 +79,28 @@ export const MainMenu = () => {
     setOperation('Fight');
     setMenuPage('NewScene');
   };
+  const functionCloseStarterKit = () => {
+    setClosedStarterKitPopup(true);
+  };
+
+  const contractCallAction = (operation) => {
+    doContractCall({
+      network: activeNetwork,
+      anchorMode: AnchorMode.Any,
+      contractAddress: contractAddress,
+      contractName: contractName.main,
+      functionName: functionName[operation],
+      functionArgs: [],
+      postConditionMode: PostConditionMode.Allow,
+      onFinish: (data) => {
+        console.log(`Finished ${operation}`, data);
+        console.log(`Check transaction with txId: ${data.txId}`);
+      },
+      onCancel: () => {
+        console.log(`Canceled: ${operation}`);
+      },
+    });
+  };
 
   const fetchMainDictionary = useCallback(async () => {
     let mainDataDictionaryLocal = {};
@@ -88,6 +111,10 @@ export const MainMenu = () => {
         [item]: `${baseImgUrl}/${item}.png`,
       };
     });
+
+    mainDataDictionaryLocal['fighting-status'] = await fetchStatusData('fightStatus', userAddress);
+
+    mainDataDictionaryLocal['starter-kit-status'] = await fetchStatusData('starterKitStatus', userAddress);
 
     mainDataDictionaryLocal['fighting-resources'] = await fetchMainOperationData('fighting-resources');
 
@@ -124,6 +151,38 @@ export const MainMenu = () => {
     MainMenu: (
       <div className="fullscreen-div">
         {!hasRespondedData && <div>Loading...</div>}
+        {hasRespondedData &&
+          mainDataDictionary['starter-kit-status']['claimed-starter-kit'] == false &&
+          closedStarterKitPopup == false && (
+            <div className="popup-sk">
+              <div className="popup-sk-inner">
+                Claim starter kit!<br></br>
+                <div className="img-container-new-scene">
+                  <figure>
+                    <img src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][1]}`}></img>
+                    <figcaption>15</figcaption>
+                  </figure>
+                </div>
+                <div className="img-container-new-scene">
+                  <figure>
+                    <img src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][2]}`}></img>
+                    <figcaption>100</figcaption>
+                  </figure>
+                </div>
+                <br></br>
+                <button
+                  onClick={() => {
+                    contractCallAction('ClaimStarterKit');
+                  }}
+                >
+                  Claim
+                </button>
+                <button className="close-btn" onClick={functionCloseStarterKit}>
+                  close
+                </button>
+              </div>
+            </div>
+          )}
         {hasRespondedData && (
           <div>
             <NavBar menuPage={menuPage} setMenuPage={setMenuPage} operation={operation} setOperation={setOperation} />
@@ -464,9 +523,7 @@ export const MainMenu = () => {
                   <span className="tooltipTextBottom">
                     <h3>Fighting here!</h3>
                     <br />
-                    Last Fight:
-                    <br />
-                    Upcoming Fight:
+                    Upcoming Fight: Fight {mainDataDictionary['fighting-status']['next-fight']}/10
                     <br />
                     <br />
                     <button onClick={fightFunction}>Fight</button>

@@ -5,6 +5,7 @@ import {
   fetchReadOnlyMining,
   fetchReadOnlyHarvesting,
   fetchReadOnlyBalances,
+  fetchReadOnlyStatus,
 } from './fetchReadOnly';
 
 export const fetchMainOperationData = async (operation) => {
@@ -89,6 +90,47 @@ export const fetchBalancesData = async (operation, userAddress) => {
       });
     }
   }
+  return operationDictionaryLocal;
+};
+
+export const fetchStatusData = async (operation, userAddress) => {
+  /// e.g. operation = fighting-resources
+  let operationDictionaryLocal = {};
+  let mainOperationsDataLocal = '';
+  let startingIndex = 0;
+  let total = 3;
+  let finalIndex = total;
+  let operationList = dataFunctionNames[operation].list;
+
+  mainOperationsDataLocal = await fetchReadOnlyStatus(
+    `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+    userAddress
+  );
+  console.log(await mainOperationsDataLocal, 'DICTIONARY STATUS');
+  if (mainOperationsDataLocal != '') {
+    // for every returned value, keep number of resources sets (resource-id, resource-qty)
+
+    if (operation == 'fightStatus') {
+      if (mainOperationsDataLocal.value.value == null)
+        operationDictionaryLocal = {
+          'next-fight': 1,
+        };
+      else
+        operationDictionaryLocal = {
+          'next-fight': mainOperationsDataLocal.value.value,
+        };
+    } else if (operation == 'starterKitStatus') {
+      if (mainOperationsDataLocal.value.value == null)
+        operationDictionaryLocal = {
+          'claimed-starter-kit': false,
+        };
+      else
+        operationDictionaryLocal = {
+          'claimed-starter-kit': mainOperationsDataLocal.value.value,
+        };
+    }
+  }
+
   return operationDictionaryLocal;
 };
 

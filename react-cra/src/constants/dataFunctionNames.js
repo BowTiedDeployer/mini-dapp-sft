@@ -72,4 +72,16 @@ export const dataFunctionNames = {
     value: 'balance',
     list: itemsList,
   },
+  fightStatus: {
+    functionName: 'get-fight-status',
+    key: 'user',
+    value: 'next-fight',
+    list: [],
+  },
+  starterKitStatus: {
+    functionName: 'get-starter-kit-status',
+    key: 'user',
+    value: 'claimed',
+    list: [],
+  },
 };

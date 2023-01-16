@@ -8,7 +8,8 @@ import { acquisitionList, craftingList, itemTypeDictionary, levelUpList } from '
 import { StacksMainnet, StacksMocknet, StacksTestnet } from '@stacks/network';
 import { network } from '../constants/network';
 import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
-import { contractAddress, functionName } from '../constants/contract';
+import { contractAddress, contractName, functionName } from '../constants/contract';
+import { activeNetwork } from './MainMenu';
 
 export const NewScene = (props) => {
   // make a fn to get an id as an arg and return whether true or false (if sufficient balance)
@@ -43,15 +44,13 @@ export const NewScene = (props) => {
     });
     return value;
   };
-  const activeNetwork =
-    network === 'mainnet' ? new StacksMainnet() : network === 'testnet' ? new StacksTestnet() : new StacksMocknet();
 
   const contractCallAction = () => {
     doContractCall({
       network: activeNetwork,
       anchorMode: AnchorMode.Any,
       contractAddress: contractAddress,
-      contractName: 'main-sc',
+      contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: [uintCV(selectedItem)],
       postConditionMode: PostConditionMode.Allow,
