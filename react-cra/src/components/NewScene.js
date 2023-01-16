@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import NavBar from "./NavBar";
-import shopBackground from "../resources/shop.png";
-import fightBackground from "../resources/battle.png";
-import { baseImgUrl } from "../constants/baseImgUrl";
-import {
-  acquisitionList,
-  craftingList,
-  itemTypeDictionary,
-  levelUpList,
-} from "../constants/dataLists";
+import React, { useState } from 'react';
+import { useConnect } from '@stacks/connect-react';
+import NavBar from './NavBar';
+import shopBackground from '../resources/shop.png';
+import fightBackground from '../resources/battle.png';
+import { baseImgUrl } from '../constants/baseImgUrl';
+import { acquisitionList, craftingList, itemTypeDictionary, levelUpList } from '../constants/dataLists';
+import { StacksMainnet, StacksMocknet, StacksTestnet } from '@stacks/network';
+import { network } from '../constants/network';
+import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
+import { contractAddress, functionName } from '../constants/contract';
 
 export const NewScene = (props) => {
   // make a fn to get an id as an arg and return whether true or false (if sufficient balance)
@@ -28,80 +28,109 @@ export const NewScene = (props) => {
     setSelectedShoes,
     setMenuPage,
   } = props;
-  const [selectedType, setSelectedType] = useState("sword");
+  const { doContractCall } = useConnect();
+  const [selectedType, setSelectedType] = useState('sword');
   const [selectedItem, setSelectedItem] = useState(0);
-  const craftLikeOperationList = ["Craft", "LevelUp", "Shop", "Inventory"];
+  const craftLikeOperationList = ['Craft', 'LevelUp', 'Shop'];
   const checkBalanceByOperation = (itemId, operation) => {
     let value = true;
-    Object.keys(mainDataDictionary[operation][itemId]).forEach(
-      (resourceSet) => {
-        let resourceId =
-          mainDataDictionary[operation][itemId][resourceSet]["resource-id"]
-            .value;
-        let resourceQty = parseInt(
-          mainDataDictionary[operation][itemId][resourceSet]["resource-qty"]
-            .value
-        );
-        if (
-          parseInt(mainDataDictionary["balances"][resourceId]) < resourceQty
-        ) {
-          value = false;
-        }
+    Object.keys(mainDataDictionary[operation][itemId]).forEach((resourceSet) => {
+      let resourceId = mainDataDictionary[operation][itemId][resourceSet]['resource-id'].value;
+      let resourceQty = parseInt(mainDataDictionary[operation][itemId][resourceSet]['resource-qty'].value);
+      if (parseInt(mainDataDictionary['balances'][resourceId]) < resourceQty) {
+        value = false;
       }
-    );
+    });
     return value;
+  };
+  const activeNetwork =
+    network === 'mainnet' ? new StacksMainnet() : network === 'testnet' ? new StacksTestnet() : new StacksMocknet();
+
+  const contractCallAction = () => {
+    doContractCall({
+      network: activeNetwork,
+      anchorMode: AnchorMode.Any,
+      contractAddress: contractAddress,
+      contractName: 'main-sc',
+      functionName: functionName[operation],
+      functionArgs: [uintCV(selectedItem)],
+      postConditionMode: PostConditionMode.Allow,
+      onFinish: (data) => {
+        console.log(`Finished ${operation}`, data);
+        console.log(`Check transaction with txId: ${data.txId}`);
+      },
+      onCancel: () => {
+        console.log(`Canceled: ${operation}`);
+      },
+    });
   };
 
   const checkBalanceById = (itemId) => {
-    if (parseInt(mainDataDictionary["balances"][itemId]) == 0) {
+    if (parseInt(mainDataDictionary['balances'][itemId]) == 0) {
       return false;
     } else return true;
   };
 
+  const resourcesFunction = () => {
+    setSelectedType('resource');
+  };
   const swordFunction = () => {
-    setSelectedType("sword");
+    setSelectedType('sword');
   };
   const armorFunction = () => {
-    setSelectedType("armor");
+    setSelectedType('armor');
   };
   const shieldFunction = () => {
-    setSelectedType("shield");
+    setSelectedType('shield');
   };
   const helmetFunction = () => {
-    setSelectedType("helmet");
+    setSelectedType('helmet');
   };
   const shoesFunction = () => {
-    setSelectedType("shoes");
+    setSelectedType('shoes');
   };
   const axeFunction = () => {
-    setSelectedType("axe");
+    setSelectedType('axe');
   };
   const pickAxeFunction = () => {
-    setSelectedType("pickaxe");
+    setSelectedType('pickaxe');
   };
   const onClickBack = () => {
-    setMenuPage("MainMenu");
+    setSelectedItem(0);
+    setMenuPage('MainMenu');
   };
   const onClickItem = (itemId) => {
     setSelectedItem(itemId);
   };
   const onClickInventory = (itemId) => {
-    if (selectedType == "sword") {
-      localStorage.setItem("selectedSword", itemId);
-      setSelectedSword(itemId);
-    } else if (selectedType == "armor") {
-      localStorage.setItem("selectedArmor", itemId);
-      setSelectedArmor(itemId);
-    } else if (selectedType == "shield") {
-      localStorage.setItem("selectedShield", itemId);
-      setSelectedShield(itemId);
-    } else if (selectedType == "helmet") {
-      localStorage.setItem("selectedHelmet", itemId);
-      setSelectedHelmet(itemId);
-    } else if (selectedType == "shoes") {
-      localStorage.setItem("selectedShoes", itemId);
-      setSelectedShoes(itemId);
+    if (selectedType == 'sword') {
+      localStorage.setItem('selectedSword', itemId);
+      setSelectedSword(itemId.toString());
+    } else if (selectedType == 'armor') {
+      localStorage.setItem('selectedArmor', itemId);
+      setSelectedArmor(itemId.toString());
+    } else if (selectedType == 'shield') {
+      localStorage.setItem('selectedShield', itemId);
+      setSelectedShield(itemId.toString());
+    } else if (selectedType == 'helmet') {
+      localStorage.setItem('selectedHelmet', itemId);
+      setSelectedHelmet(itemId.toString());
+    } else if (selectedType == 'shoes') {
+      localStorage.setItem('selectedShoes', itemId);
+      setSelectedShoes(itemId.toString());
     }
+  };
+  const unequipItems = () => {
+    localStorage.setItem('selectedSword', '');
+    localStorage.setItem('selectedArmor', '');
+    localStorage.setItem('selectedShield', '');
+    localStorage.setItem('selectedHelmet', '');
+    localStorage.setItem('selectedShoes', '');
+    setSelectedSword('');
+    setSelectedArmor('');
+    setSelectedShield('');
+    setSelectedHelmet('');
+    setSelectedShoes('');
   };
   const newSceneMapping = {
     Shop: (
@@ -114,45 +143,27 @@ export const NewScene = (props) => {
           <br></br>
           {itemTypeDictionary[selectedType].map((item) => {
             if (acquisitionList.indexOf(item) > -1)
-              if (checkBalanceByOperation(item, "acquisition"))
+              if (checkBalanceByOperation(item, 'Shop'))
                 return (
-                  <div
-                    key={item}
-                    className="img-container-new-scene"
-                    onClick={() => onClickItem(item)}
-                  >
+                  <div key={item} className="img-container-new-scene" onClick={() => onClickItem(item)}>
                     <figure>
                       <img
                         src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary.itemsImages[item]}`}
                         key={item}
                       ></img>
-                      <figcaption>
-                        {mainDataDictionary["token-name"][item].name.replaceAll(
-                          "_",
-                          " "
-                        )}
-                      </figcaption>
+                      <figcaption>{mainDataDictionary['token-name'][item].name.replaceAll('_', ' ')}</figcaption>
                     </figure>
                   </div>
                 );
               else
                 return (
-                  <div
-                    key={item}
-                    className="img-container-new-scene-no-balance"
-                    onClick={() => onClickItem(item)}
-                  >
+                  <div key={item} className="img-container-new-scene-no-balance" onClick={() => onClickItem(item)}>
                     <figure>
                       <img
                         src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary.itemsImages[item]}`}
                         key={item}
                       ></img>
-                      <figcaption>
-                        {mainDataDictionary["token-name"][item].name.replaceAll(
-                          "_",
-                          " "
-                        )}
-                      </figcaption>
+                      <figcaption>{mainDataDictionary['token-name'][item].name.replaceAll('_', ' ')}</figcaption>
                     </figure>
                   </div>
                 );
@@ -163,91 +174,73 @@ export const NewScene = (props) => {
           <br></br>
           {selectedItem != 0 && (
             <div>
-              {mainDataDictionary["token-name"][selectedItem].name
-                .replaceAll("_", " ")
-                .toUpperCase()}
+              {mainDataDictionary['token-name'][selectedItem].name.replaceAll('_', ' ').toUpperCase()}
               <br></br>
               <br></br>
-              Damage:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.damage}
+              Damage: {mainDataDictionary['token-name'][selectedItem].values.damage}
               <br></br>
-              Defence:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.defense}
+              Defence: {mainDataDictionary['token-name'][selectedItem].values.defense}
               <br></br>
-              Health:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.health}
+              Health: {mainDataDictionary['token-name'][selectedItem].values.health}
               <br></br>
               <br></br>
               Needed Resources:
               <br></br>
-              {
-                mainDataDictionary.acquisition[selectedItem] &&
-                  Object.keys(mainDataDictionary.acquisition[selectedItem]).map(
-                    (resourceSet) => {
-                      if (
-                        parseInt(
-                          mainDataDictionary["balances"][
-                            mainDataDictionary.acquisition[selectedItem][
-                              resourceSet
-                            ]["resource-id"].value
-                          ]
-                        ) >
-                        parseInt(
-                          mainDataDictionary.acquisition[selectedItem][
-                            resourceSet
-                          ]["resource-qty"].value
-                        )
-                      )
-                        return (
-                          <div className="img-container-new-scene">
-                            <figure>
-                              <img
-                                src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                  mainDataDictionary.itemsImages[
-                                    mainDataDictionary.acquisition[
-                                      selectedItem
-                                    ][resourceSet]["resource-id"].value
-                                  ]
-                                }`}
-                              ></img>
-                              <figcaption>
-                                {
-                                  mainDataDictionary.acquisition[selectedItem][
-                                    resourceSet
-                                  ]["resource-qty"].value
-                                }
-                              </figcaption>
-                            </figure>
-                            <button>Buy Item</button>
-                          </div>
-                        );
-                      else
-                        return (
-                          <div className="img-container-new-scene">
-                            <figure>
-                              <img
-                                src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                  mainDataDictionary.itemsImages[
-                                    mainDataDictionary.acquisition[
-                                      selectedItem
-                                    ][resourceSet]["resource-id"].value
-                                  ]
-                                }`}
-                              ></img>
-                              <figcaption className="font-color-no-balance">
-                                {
-                                  mainDataDictionary.acquisition[selectedItem][
-                                    resourceSet
-                                  ]["resource-qty"].value
-                                }
-                              </figcaption>
-                            </figure>
-                          </div>
-                        );
-                    }
+              {mainDataDictionary.Shop[selectedItem] &&
+                Object.keys(mainDataDictionary.Shop[selectedItem]).map((resourceSet) => {
+                  if (
+                    parseInt(
+                      mainDataDictionary['balances'][
+                        mainDataDictionary.Shop[selectedItem][resourceSet]['resource-id'].value
+                      ]
+                    ) >= parseInt(mainDataDictionary.Shop[selectedItem][resourceSet]['resource-qty'].value)
                   )
-                // <button disabled={}>Insufficient Balance</button>
-              }
+                    return (
+                      <div className="img-container-new-scene">
+                        <figure>
+                          <img
+                            src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                              mainDataDictionary.itemsImages[
+                                mainDataDictionary.Shop[selectedItem][resourceSet]['resource-id'].value
+                              ]
+                            }`}
+                          ></img>
+                          <figcaption>
+                            {mainDataDictionary.Shop[selectedItem][resourceSet]['resource-qty'].value}
+                          </figcaption>
+                        </figure>
+                      </div>
+                    );
+                  else
+                    return (
+                      <div className="img-container-new-scene">
+                        <figure>
+                          <img
+                            src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                              mainDataDictionary.itemsImages[
+                                mainDataDictionary.Shop[selectedItem][resourceSet]['resource-id'].value
+                              ]
+                            }`}
+                          ></img>
+                          <figcaption className="font-color-no-balance">
+                            {mainDataDictionary.Shop[selectedItem][resourceSet]['resource-qty'].value}
+                          </figcaption>
+                        </figure>
+                      </div>
+                    );
+                })}
+              <div>
+                <button
+                  // disabled={
+                  //   selectedItem && operation == "Shop"
+                  //     ? !checkBalanceByOperation(selectedItem, "Shop")
+                  //     : true
+                  // }
+                  onClick={contractCallAction}
+                >
+                  Buy item
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -266,45 +259,27 @@ export const NewScene = (props) => {
           <br></br>
           {itemTypeDictionary[selectedType].map((item) => {
             if (craftingList.indexOf(item) > -1)
-              if (checkBalanceByOperation(item, "crafting"))
+              if (checkBalanceByOperation(item, 'Craft'))
                 return (
-                  <div
-                    key={item}
-                    className="img-container-new-scene"
-                    onClick={() => onClickItem(item)}
-                  >
+                  <div key={item} className="img-container-new-scene" onClick={() => onClickItem(item)}>
                     <figure>
                       <img
                         src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary.itemsImages[item]}`}
                         key={item}
                       ></img>
-                      <figcaption>
-                        {mainDataDictionary["token-name"][item].name.replaceAll(
-                          "_",
-                          " "
-                        )}
-                      </figcaption>
+                      <figcaption>{mainDataDictionary['token-name'][item].name.replaceAll('_', ' ')}</figcaption>
                     </figure>
                   </div>
                 );
               else
                 return (
-                  <div
-                    key={item}
-                    className="img-container-new-scene-no-balance"
-                    onClick={() => onClickItem(item)}
-                  >
+                  <div key={item} className="img-container-new-scene-no-balance" onClick={() => onClickItem(item)}>
                     <figure>
                       <img
                         src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary.itemsImages[item]}`}
                         key={item}
                       ></img>
-                      <figcaption>
-                        {mainDataDictionary["token-name"][item].name.replaceAll(
-                          "_",
-                          " "
-                        )}
-                      </figcaption>
+                      <figcaption>{mainDataDictionary['token-name'][item].name.replaceAll('_', ' ')}</figcaption>
                     </figure>
                   </div>
                 );
@@ -315,87 +290,74 @@ export const NewScene = (props) => {
           <br></br>
           {selectedItem != 0 && (
             <div>
-              {mainDataDictionary["token-name"][selectedItem].name
-                .replaceAll("_", " ")
-                .toUpperCase()}
+              {mainDataDictionary['token-name'][selectedItem].name.replaceAll('_', ' ').toUpperCase()}
               <br></br>
               <br></br>
-              Damage:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.damage}
+              Damage: {mainDataDictionary['token-name'][selectedItem].values.damage}
               <br></br>
-              Defence:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.defense}
+              Defence: {mainDataDictionary['token-name'][selectedItem].values.defense}
               <br></br>
-              Health:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.health}
+              Health: {mainDataDictionary['token-name'][selectedItem].values.health}
               <br></br>
               <br></br>
               Needed Resources:
               <br></br>
-              {mainDataDictionary.crafting[selectedItem] &&
-                Object.keys(mainDataDictionary.crafting[selectedItem]).map(
-                  (resourceSet) => {
-                    if (
-                      parseInt(
-                        mainDataDictionary["balances"][
-                          mainDataDictionary.crafting[selectedItem][
-                            resourceSet
-                          ]["resource-id"].value
-                        ]
-                      ) >
-                      parseInt(
-                        mainDataDictionary.crafting[selectedItem][resourceSet][
-                          "resource-qty"
-                        ].value
-                      )
-                    )
-                      return (
-                        <div className="img-container-new-scene">
-                          <figure>
-                            <img
-                              src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                mainDataDictionary.itemsImages[
-                                  mainDataDictionary.crafting[selectedItem][
-                                    resourceSet
-                                  ]["resource-id"].value
-                                ]
-                              }`}
-                            ></img>
-                            <figcaption>
-                              {
-                                mainDataDictionary.crafting[selectedItem][
-                                  resourceSet
-                                ]["resource-qty"].value
-                              }
-                            </figcaption>
-                          </figure>
-                        </div>
-                      );
-                    else
-                      return (
-                        <div className="img-container-new-scene">
-                          <figure>
-                            <img
-                              src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                mainDataDictionary.itemsImages[
-                                  mainDataDictionary.crafting[selectedItem][
-                                    resourceSet
-                                  ]["resource-id"].value
-                                ]
-                              }`}
-                            ></img>
-                            <figcaption className="font-color-no-balance">
-                              {
-                                mainDataDictionary.crafting[selectedItem][
-                                  resourceSet
-                                ]["resource-qty"].value
-                              }
-                            </figcaption>
-                          </figure>
-                        </div>
-                      );
-                  }
-                )}
+              {mainDataDictionary.Craft[selectedItem] &&
+                Object.keys(mainDataDictionary.Craft[selectedItem]).map((resourceSet) => {
+                  if (
+                    parseInt(
+                      mainDataDictionary['balances'][
+                        mainDataDictionary.Craft[selectedItem][resourceSet]['resource-id'].value
+                      ]
+                    ) >= parseInt(mainDataDictionary.Craft[selectedItem][resourceSet]['resource-qty'].value)
+                  )
+                    return (
+                      <div className="img-container-new-scene">
+                        <figure>
+                          <img
+                            src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                              mainDataDictionary.itemsImages[
+                                mainDataDictionary.Craft[selectedItem][resourceSet]['resource-id'].value
+                              ]
+                            }`}
+                          ></img>
+                          <figcaption>
+                            {mainDataDictionary.Craft[selectedItem][resourceSet]['resource-qty'].value}
+                          </figcaption>
+                        </figure>
+                      </div>
+                    );
+                  else
+                    return (
+                      <div className="img-container-new-scene">
+                        <figure>
+                          <img
+                            src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                              mainDataDictionary.itemsImages[
+                                mainDataDictionary.Craft[selectedItem][resourceSet]['resource-id'].value
+                              ]
+                            }`}
+                          ></img>
+                          <figcaption className="font-color-no-balance">
+                            {mainDataDictionary.Craft[selectedItem][resourceSet]['resource-qty'].value}
+                          </figcaption>
+                        </figure>
+                      </div>
+                    );
+                })}
+              <div>
+                <button
+                  // disabled={
+                  //   selectedItem && operation == 'Craft'
+                  //     ? !checkBalanceByOperation(selectedItem, 'Craft')
+                  //     : true
+                  // }
+
+                  onClick={contractCallAction}
+                >
+                  Craft item
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -414,45 +376,27 @@ export const NewScene = (props) => {
           <br></br>
           {itemTypeDictionary[selectedType].map((item) => {
             if (levelUpList.indexOf(item) > -1)
-              if (checkBalanceByOperation(item, "level-up"))
+              if (checkBalanceByOperation(item, 'LevelUp'))
                 return (
-                  <div
-                    key={item}
-                    className="img-container-new-scene"
-                    onClick={() => onClickItem(item)}
-                  >
+                  <div key={item} className="img-container-new-scene" onClick={() => onClickItem(item)}>
                     <figure>
                       <img
                         src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary.itemsImages[item]}`}
                         key={item}
                       ></img>
-                      <figcaption>
-                        {mainDataDictionary["token-name"][item].name.replaceAll(
-                          "_",
-                          " "
-                        )}
-                      </figcaption>
+                      <figcaption>{mainDataDictionary['token-name'][item].name.replaceAll('_', ' ')}</figcaption>
                     </figure>
                   </div>
                 );
               else
                 return (
-                  <div
-                    key={item}
-                    className="img-container-new-scene-no-balance"
-                    onClick={() => onClickItem(item)}
-                  >
+                  <div key={item} className="img-container-new-scene-no-balance" onClick={() => onClickItem(item)}>
                     <figure>
                       <img
                         src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary.itemsImages[item]}`}
                         key={item}
                       ></img>
-                      <figcaption>
-                        {mainDataDictionary["token-name"][item].name.replaceAll(
-                          "_",
-                          " "
-                        )}
-                      </figcaption>
+                      <figcaption>{mainDataDictionary['token-name'][item].name.replaceAll('_', ' ')}</figcaption>
                     </figure>
                   </div>
                 );
@@ -463,87 +407,72 @@ export const NewScene = (props) => {
           <br></br>
           {selectedItem != 0 && (
             <div>
-              {mainDataDictionary["token-name"][selectedItem].name
-                .replaceAll("_", " ")
-                .toUpperCase()}
+              {mainDataDictionary['token-name'][selectedItem].name.replaceAll('_', ' ').toUpperCase()}
               <br></br>
               <br></br>
-              Damage:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.damage}
+              Damage: {mainDataDictionary['token-name'][selectedItem].values.damage}
               <br></br>
-              Defence:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.defense}
+              Defence: {mainDataDictionary['token-name'][selectedItem].values.defense}
               <br></br>
-              Health:{" "}
-              {mainDataDictionary["token-name"][selectedItem].values.health}
+              Health: {mainDataDictionary['token-name'][selectedItem].values.health}
               <br></br>
               <br></br>
               Needed Resources:
               <br></br>
-              {mainDataDictionary["level-up"][selectedItem] &&
-                Object.keys(mainDataDictionary["level-up"][selectedItem]).map(
-                  (resourceSet) => {
-                    if (
-                      parseInt(
-                        mainDataDictionary["balances"][
-                          mainDataDictionary["level-up"][selectedItem][
-                            resourceSet
-                          ]["resource-id"].value
-                        ]
-                      ) >
-                      parseInt(
-                        mainDataDictionary["level-up"][selectedItem][
-                          resourceSet
-                        ]["resource-qty"].value
-                      )
-                    )
-                      return (
-                        <div className="img-container-new-scene">
-                          <figure>
-                            <img
-                              src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                mainDataDictionary.itemsImages[
-                                  mainDataDictionary["level-up"][selectedItem][
-                                    resourceSet
-                                  ]["resource-id"].value
-                                ]
-                              }`}
-                            ></img>
-                            <figcaption>
-                              {
-                                mainDataDictionary["level-up"][selectedItem][
-                                  resourceSet
-                                ]["resource-qty"].value
-                              }
-                            </figcaption>
-                          </figure>
-                        </div>
-                      );
-                    else
-                      return (
-                        <div className="img-container-new-scene">
-                          <figure>
-                            <img
-                              src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                                mainDataDictionary.itemsImages[
-                                  mainDataDictionary["level-up"][selectedItem][
-                                    resourceSet
-                                  ]["resource-id"].value
-                                ]
-                              }`}
-                            ></img>
-                            <figcaption className="font-color-no-balance">
-                              {
-                                mainDataDictionary["level-up"][selectedItem][
-                                  resourceSet
-                                ]["resource-qty"].value
-                              }
-                            </figcaption>
-                          </figure>
-                        </div>
-                      );
-                  }
-                )}
+              {mainDataDictionary['LevelUp'][selectedItem] &&
+                Object.keys(mainDataDictionary['LevelUp'][selectedItem]).map((resourceSet) => {
+                  if (
+                    parseInt(
+                      mainDataDictionary['balances'][
+                        mainDataDictionary['LevelUp'][selectedItem][resourceSet]['resource-id'].value
+                      ]
+                    ) >= parseInt(mainDataDictionary['LevelUp'][selectedItem][resourceSet]['resource-qty'].value)
+                  )
+                    return (
+                      <div className="img-container-new-scene">
+                        <figure>
+                          <img
+                            src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                              mainDataDictionary.itemsImages[
+                                mainDataDictionary['LevelUp'][selectedItem][resourceSet]['resource-id'].value
+                              ]
+                            }`}
+                          ></img>
+                          <figcaption>
+                            {mainDataDictionary['LevelUp'][selectedItem][resourceSet]['resource-qty'].value}
+                          </figcaption>
+                        </figure>
+                      </div>
+                    );
+                  else
+                    return (
+                      <div className="img-container-new-scene">
+                        <figure>
+                          <img
+                            src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                              mainDataDictionary.itemsImages[
+                                mainDataDictionary['LevelUp'][selectedItem][resourceSet]['resource-id'].value
+                              ]
+                            }`}
+                          ></img>
+                          <figcaption className="font-color-no-balance">
+                            {mainDataDictionary['LevelUp'][selectedItem][resourceSet]['resource-qty'].value}
+                          </figcaption>
+                        </figure>
+                      </div>
+                    );
+                })}
+              <div>
+                <button
+                  // disabled={
+                  //   selectedItem && operation == 'LevelUp' ? !checkBalanceByOperation(selectedItem, 'LevelUp') : true
+                  // }
+
+                  onClick={contractCallAction}
+                >
+                  Level up item
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -572,23 +501,55 @@ export const NewScene = (props) => {
           {itemTypeDictionary[selectedType].map((item) => {
             if (checkBalanceById(item))
               return (
-                <div
-                  key={item}
-                  className="img-container-new-scene"
-                  onClick={() => onClickInventory(item, selectedItem)}
-                >
-                  <figure>
-                    <img
-                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary.itemsImages[item]}`}
-                      key={item}
-                    ></img>
-                    <figcaption>
-                      {mainDataDictionary["token-name"][item].name.replaceAll(
-                        "_",
-                        " "
-                      )}
-                    </figcaption>
-                  </figure>
+                <div className="tooltipTopInventory">
+                  <div key={item} className="img-container-new-scene">
+                    <figure>
+                      <img
+                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary.itemsImages[item]}`}
+                        key={item}
+                      ></img>
+                      <figcaption>
+                        {mainDataDictionary['balances'][item]}
+                        <br></br>
+                        {/* {mainDataDictionary['token-name'][item].name.replaceAll('_', ' ')} */}
+                      </figcaption>
+                    </figure>
+                  </div>
+                  <span className="tooltipTextTopInventory">
+                    {selectedType == 'resource' && mainDataDictionary['token-name'][item]['name']}
+                    {selectedType != 'resource' && selectedType != 'axe' && selectedType != 'pickaxe' && (
+                      <div>
+                        {mainDataDictionary['token-name'][item]['name'].replaceAll('_', ' ').toUpperCase()}
+                        <br></br>
+                        <br></br>
+                        STATISTICS
+                        <br></br>
+                        <br></br>
+                        Damage: {mainDataDictionary['token-name'][item].values.damage}
+                        <br></br>
+                        Defence: {mainDataDictionary['token-name'][item].values.defense}
+                        <br></br>
+                        Health: {mainDataDictionary['token-name'][item].values.health}
+                        <br></br>
+                        <button onClick={() => onClickInventory(item)}>Equip</button>
+                      </div>
+                    )}
+                    {(selectedType == 'axe' || selectedType == 'pickaxe') && (
+                      <div>
+                        {mainDataDictionary['token-name'][item]['name'].replaceAll('_', ' ').toUpperCase()}
+                        <br></br>
+                        <br></br>
+                        STATISTICS
+                        <br></br>
+                        <br></br>
+                        Damage: {mainDataDictionary['token-name'][item].values.damage}
+                        <br></br>
+                        Defence: {mainDataDictionary['token-name'][item].values.defense}
+                        <br></br>
+                        Health: {mainDataDictionary['token-name'][item].values.health}
+                      </div>
+                    )}
+                  </span>
                 </div>
               );
           })}
@@ -596,80 +557,152 @@ export const NewScene = (props) => {
         <div className="right-div">
           <h4>Equipped Items</h4>
           <br></br>
+          <button onClick={unequipItems}>Unequip</button>
+          <br></br>
           {
             <div>
               Helmet:
               {selectedHelmet && (
-                <figure>
-                  <img
-                    src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                      mainDataDictionary.itemsImages[parseInt(selectedHelmet)]
-                    }`}
-                  ></img>
-                  <figcaption>
-                    {mainDataDictionary["token-name"][selectedHelmet]["name"]}
-                  </figcaption>
-                </figure>
+                <div className="tooltipTopInventory">
+                  <figure>
+                    <img
+                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                        mainDataDictionary.itemsImages[parseInt(selectedHelmet)]
+                      }`}
+                    ></img>
+                  </figure>
+                  <span className="tooltipTextTopInventory">
+                    <div>
+                      {mainDataDictionary['token-name'][selectedHelmet]['name'].replaceAll('_', ' ').toUpperCase()}
+                      <br></br>
+                      <br></br>
+                      STATISTICS
+                      <br></br>
+                      <br></br>
+                      Damage: {mainDataDictionary['token-name'][selectedHelmet].values.damage}
+                      <br></br>
+                      Defence: {mainDataDictionary['token-name'][selectedHelmet].values.defense}
+                      <br></br>
+                      Health: {mainDataDictionary['token-name'][selectedHelmet].values.health}
+                    </div>
+                  </span>
+                </div>
               )}
               {!selectedHelmet && <div>No helmet selected</div>}
               <br></br>
               Armor:
               {selectedArmor && (
-                <figure>
-                  <img
-                    src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                      mainDataDictionary.itemsImages[parseInt(selectedArmor)]
-                    }`}
-                  ></img>
-                  <figcaption>
-                    {mainDataDictionary["token-name"][selectedArmor]["name"]}
-                  </figcaption>
-                </figure>
+                <div className="tooltipTopInventory">
+                  <figure>
+                    <img
+                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                        mainDataDictionary.itemsImages[parseInt(selectedArmor)]
+                      }`}
+                    ></img>
+                  </figure>
+                  <span className="tooltipTextTopInventory">
+                    <div>
+                      {mainDataDictionary['token-name'][selectedArmor]['name'].replaceAll('_', ' ').toUpperCase()}
+                      <br></br>
+                      <br></br>
+                      STATISTICS
+                      <br></br>
+                      <br></br>
+                      Damage: {mainDataDictionary['token-name'][selectedArmor].values.damage}
+                      <br></br>
+                      Defence: {mainDataDictionary['token-name'][selectedArmor].values.defense}
+                      <br></br>
+                      Health: {mainDataDictionary['token-name'][selectedArmor].values.health}
+                    </div>
+                  </span>
+                </div>
               )}
               {!selectedArmor && <div>No armor selected</div>}
               <br></br>
               Sword:
               {selectedSword && (
-                <figure>
-                  <img
-                    src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                      mainDataDictionary["itemsImages"][parseInt(selectedSword)]
-                    }`}
-                  ></img>
-                  <figcaption>
-                    {mainDataDictionary["token-name"][selectedSword]["name"]}
-                  </figcaption>
-                </figure>
+                <div className="tooltipTopInventory">
+                  <figure>
+                    <img
+                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                        mainDataDictionary['itemsImages'][parseInt(selectedSword)]
+                      }`}
+                    ></img>
+                  </figure>
+                  <span className="tooltipTextTopInventory">
+                    <div>
+                      {mainDataDictionary['token-name'][selectedSword]['name'].replaceAll('_', ' ').toUpperCase()}
+                      <br></br>
+                      <br></br>
+                      STATISTICS
+                      <br></br>
+                      <br></br>
+                      Damage: {mainDataDictionary['token-name'][selectedSword].values.damage}
+                      <br></br>
+                      Defence: {mainDataDictionary['token-name'][selectedSword].values.defense}
+                      <br></br>
+                      Health: {mainDataDictionary['token-name'][selectedSword].values.health}
+                    </div>
+                  </span>
+                </div>
               )}
               {!selectedSword && <div>No sword selected</div>}
               <br></br>
               Shield:
               {selectedShield && (
-                <figure>
-                  <img
-                    src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                      mainDataDictionary.itemsImages[parseInt(selectedShield)]
-                    }`}
-                  ></img>
-                  <figcaption>
-                    {mainDataDictionary["token-name"][selectedShield]["name"]}
-                  </figcaption>
-                </figure>
+                <div className="tooltipTopInventory">
+                  <figure>
+                    <img
+                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                        mainDataDictionary.itemsImages[parseInt(selectedShield)]
+                      }`}
+                    ></img>
+                  </figure>
+                  <span className="tooltipTextTopInventory">
+                    <div>
+                      {mainDataDictionary['token-name'][selectedShield]['name'].replaceAll('_', ' ').toUpperCase()}
+                      <br></br>
+                      <br></br>
+                      STATISTICS
+                      <br></br>
+                      <br></br>
+                      Damage: {mainDataDictionary['token-name'][selectedShield].values.damage}
+                      <br></br>
+                      Defence: {mainDataDictionary['token-name'][selectedShield].values.defense}
+                      <br></br>
+                      Health: {mainDataDictionary['token-name'][selectedShield].values.health}
+                    </div>
+                  </span>
+                </div>
               )}
               {!selectedShield && <div>No shield selected</div>}
               <br></br>
               Shoes:
               {selectedShoes && (
-                <figure>
-                  <img
-                    src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                      mainDataDictionary.itemsImages[parseInt(selectedShoes)]
-                    }`}
-                  ></img>
-                  <figcaption>
-                    {mainDataDictionary["token-name"][selectedShoes]["name"]}
-                  </figcaption>
-                </figure>
+                <div className="tooltipTopInventory">
+                  <figure>
+                    <img
+                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                        mainDataDictionary.itemsImages[parseInt(selectedShoes)]
+                      }`}
+                    ></img>
+                  </figure>
+                  <span className="tooltipTextTopInventory">
+                    <div>
+                      {mainDataDictionary['token-name'][selectedShoes]['name'].replaceAll('_', ' ').toUpperCase()}
+                      <br></br>
+                      <br></br>
+                      STATISTICS
+                      <br></br>
+                      <br></br>
+                      Damage: {mainDataDictionary['token-name'][selectedShoes].values.damage}
+                      <br></br>
+                      Defence: {mainDataDictionary['token-name'][selectedShoes].values.defense}
+                      <br></br>
+                      Health: {mainDataDictionary['token-name'][selectedShoes].values.health}
+                    </div>
+                  </span>
+                </div>
               )}
               {!selectedShoes && <div>No shoes selected</div>}
               <br></br>
@@ -688,6 +721,36 @@ export const NewScene = (props) => {
       {craftLikeOperationList.indexOf(operation) > -1 && (
         <div className="type-selector-container">
           <ul>
+            <li>
+              <button onClick={swordFunction}>Swords</button>
+            </li>
+            <li>
+              <button onClick={armorFunction}>Armors</button>
+            </li>
+            <li>
+              <button onClick={shieldFunction}>Shields</button>
+            </li>
+            <li>
+              <button onClick={helmetFunction}>Helmets</button>
+            </li>
+            <li>
+              <button onClick={shoesFunction}>Shoes</button>
+            </li>
+            <li>
+              <button onClick={axeFunction}>Axes</button>
+            </li>
+            <li>
+              <button onClick={pickAxeFunction}>Pickaxes</button>
+            </li>
+          </ul>
+        </div>
+      )}
+      {operation == 'Inventory' && (
+        <div className="type-selector-container">
+          <ul>
+            <li>
+              <button onClick={resourcesFunction}>Resources</button>
+            </li>
             <li>
               <button onClick={swordFunction}>Swords</button>
             </li>
