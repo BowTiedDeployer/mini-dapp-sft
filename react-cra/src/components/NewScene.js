@@ -22,6 +22,7 @@ export const NewScene = (props) => {
     selectedShield,
     selectedHelmet,
     selectedShoes,
+    nextFight,
     setSelectedSword,
     setSelectedArmor,
     setSelectedShield,
@@ -44,15 +45,14 @@ export const NewScene = (props) => {
     });
     return value;
   };
-
-  const contractCallAction = () => {
+  const contractCallAction = (id) => {
     doContractCall({
       network: activeNetwork,
       anchorMode: AnchorMode.Any,
       contractAddress: contractAddress,
       contractName: contractName.main,
       functionName: functionName[operation],
-      functionArgs: [uintCV(selectedItem)],
+      functionArgs: [uintCV(id)],
       postConditionMode: PostConditionMode.Allow,
       onFinish: (data) => {
         console.log(`Finished ${operation}`, data);
@@ -235,7 +235,7 @@ export const NewScene = (props) => {
                   //     ? !checkBalanceByOperation(selectedItem, "Shop")
                   //     : true
                   // }
-                  onClick={contractCallAction}
+                  onClick={() => contractCallAction(selectedItem)}
                 >
                   Buy item
                 </button>
@@ -345,7 +345,7 @@ export const NewScene = (props) => {
                     );
                 })}
               <div>
-                <button onClick={contractCallAction}>Craft item</button>
+                <button onClick={() => contractCallAction(selectedItem)}>Craft item</button>
               </div>
             </div>
           )}
@@ -457,7 +457,7 @@ export const NewScene = (props) => {
                   //   selectedItem && operation == 'LevelUp' ? !checkBalanceByOperation(selectedItem, 'LevelUp') : true
                   // }
 
-                  onClick={contractCallAction}
+                  onClick={() => contractCallAction(selectedItem)}
                 >
                   Level up item
                 </button>
@@ -473,7 +473,7 @@ export const NewScene = (props) => {
     Fight: (
       <div className="new-scene-container">
         <img className="new-scene-full" src={fightBackground}></img>
-
+        <button onClick={() => contractCallAction(nextFight)}>Start fight {nextFight}</button>
         <button onClick={onClickBack} className="close-btn">
           Back to map
         </button>

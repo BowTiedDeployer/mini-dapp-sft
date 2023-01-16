@@ -535,7 +535,7 @@ export const MainMenu = () => {
         )}
       </div>
     ),
-    PopupScene: (
+    PopupScene: hasRespondedData && (
       <div className="fullscreen-div">
         <NavBar menuPage={menuPage} setMenuPage={setMenuPage} operation={operation} setOperation={setOperation} />
         <div className="container-div">
@@ -554,7 +554,7 @@ export const MainMenu = () => {
         </div>
       </div>
     ),
-    NewScene: (
+    NewScene: hasRespondedData && (
       <div className="fullscreen-div">
         <NavBar menuPage={menuPage} setMenuPage={setMenuPage} operation={operation} setOperation={setOperation} />
         <NewScene
@@ -566,6 +566,7 @@ export const MainMenu = () => {
           selectedShield={selectedShield}
           selectedHelmet={selectedHelmet}
           selectedShoes={selectedShoes}
+          nextFight={mainDataDictionary['fighting-status']['next-fight']}
           setMenuPage={setMenuPage}
           setSelectedSword={setSelectedSword}
           setSelectedArmor={setSelectedArmor}

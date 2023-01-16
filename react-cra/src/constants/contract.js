@@ -10,4 +10,5 @@ export const functionName = {
   Craft: 'craft-item',
   Shop: 'buy-item',
   ClaimStarterKit: 'claim-starter-kit',
+  Fight: 'start-fight',
 };
