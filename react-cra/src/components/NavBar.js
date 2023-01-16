@@ -8,7 +8,7 @@ import ConnectWallet, { userSession } from './ConnectWallet';
 
 function disconnect() {
   userSession.signUserOut('/');
-  return <ConnectWallet></ConnectWallet>;
+  // return <ConnectWallet></ConnectWallet>;
 }
 
 export const NavBar = (props) => {
@@ -25,47 +25,33 @@ export const NavBar = (props) => {
     <div>
       <ul>
         <li>
-          <span onClick={onClickBack}>Home</span>
+          <span>
+            <button id="homeBtn" onClick={onClickBack}>
+              Home
+            </button>
+          </span>
         </li>
         <li>
-          <span onClick={inventoryFunction}>Inventory</span>
+          <span>
+            <button id="inventoryBtn" onClick={inventoryFunction}>
+              Inventory
+            </button>
+          </span>
         </li>
         <li>
-          <span>Dropdown</span>
+          <span>
+            <button id="dropdownBtn">Dropdown</button>
+          </span>
         </li>
         <li>
-          <span onClick={disconnect}>Disconnect Wallet</span>
+          <span>
+            <button id="disconnectBtn" onClick={disconnect}>
+              Disconnect Wallet
+            </button>
+          </span>
         </li>
       </ul>
     </div>
-    // <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-    //   <Container>
-    //     <Navbar.Brand id="navbarBrand" onClick={onClickBack}>
-    //       Home
-    //     </Navbar.Brand>
-    //     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-    //     <Navbar.Collapse id="responsive-navbar-nav">
-    //       <Nav className="me-auto">
-    //         <div id="navbarInventory" onClick={inventoryFunction}>
-    //           Inventory
-    //         </div>
-    //         <NavDropdown title="Dropdown" id="collasible-nav-dropdown">
-    //           <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-    //           <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-    //           <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-    //           <NavDropdown.Divider />
-    //           <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-    //         </NavDropdown>
-    //       </Nav>
-    //       <Form className="d-flex">
-    //         <Button onClick={disconnect} variant="outline-success">
-    //           Disconnect Wallet
-    //         </Button>
-    //       </Form>
-    //       {/* </Nav> */}
-    //     </Navbar.Collapse>
-    //   </Container>
-    // </Navbar>
   );
 };
 

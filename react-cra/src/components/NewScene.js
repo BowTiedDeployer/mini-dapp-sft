@@ -346,17 +346,7 @@ export const NewScene = (props) => {
                     );
                 })}
               <div>
-                <button
-                  // disabled={
-                  //   selectedItem && operation == 'Craft'
-                  //     ? !checkBalanceByOperation(selectedItem, 'Craft')
-                  //     : true
-                  // }
-
-                  onClick={contractCallAction}
-                >
-                  Craft item
-                </button>
+                <button onClick={contractCallAction}>Craft item</button>
               </div>
             </div>
           )}

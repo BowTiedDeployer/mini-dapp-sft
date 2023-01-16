@@ -62,14 +62,14 @@ app.post('/rewarding-mining', async (req, res) => {
 
     //get nonce
     const latestNonce = await getAccountNonce(adminAddress[network]);
-
+    console.log(mininng_time, token_id, address);
     //functionArgs
     let args = [uintCV(token_id), uintCV(mininng_time), standardPrincipalCV(address)];
 
     // postConditions
     // based on what it should get on that specific call
     // the reward here is more dinamic than on the sleeping because it also depends on the pickaxe_id
-
+    console.log(args);
     // txoptions
     let txOptions = {
       contractAddress: contractAddress[network],
@@ -91,6 +91,50 @@ app.post('/rewarding-mining', async (req, res) => {
     res.sendStatus(200);
   } catch (error) {
     console.log('mining-reward error: ', error);
+    res.sendStatus(400);
+  }
+});
+
+app.post('/rewarding-harvesting', async (req, res) => {
+  try {
+    const token_id = req.body.token_id;
+    const harvesting_time = req.body.time;
+    const address = req.body.address;
+
+    // check type correct, if not throw status error
+    if (Number.isInteger(token_id) == false || Number.isInteger(harvesting_time) == false) res.sendStatus(400);
+
+    //get nonce
+    const latestNonce = await getAccountNonce(adminAddress[network]);
+    console.log(harvesting_time, token_id, address);
+    //functionArgs
+    let args = [uintCV(token_id), uintCV(harvesting_time), standardPrincipalCV(address)];
+
+    // postConditions
+    // based on what it should get on that specific call
+    // the reward here is more dinamic than on the sleeping because it also depends on the pickaxe_id
+    console.log(args);
+    // txoptions
+    let txOptions = {
+      contractAddress: contractAddress[network],
+      contractName: 'main-sc',
+      functionName: 'reward-harvesting',
+      functionArgs: args,
+      senderKey: privateKey[network],
+      network: networkInstance,
+      // postConditions,
+      postConditionMode: PostConditionMode.Allow, // TODO: set Deny
+      fee: 10000n, // 0.01 STX
+      nonce: latestNonce,
+    };
+    let transaction = await makeContractCall(txOptions);
+
+    // broadcast
+    const tx = await broadcastTransaction(transaction, networkInstance);
+    console.log('harvesting-reward broadcasted tx: ', tx);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log('harvesting-reward error: ', error);
     res.sendStatus(400);
   }
 });

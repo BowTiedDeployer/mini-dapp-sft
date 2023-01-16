@@ -1,5 +1,5 @@
 import React from 'react';
-import { userSession } from './ConnectWallet';
+import { userAddress, userSession } from './ConnectWallet';
 import { network, serverUrl } from '../constants/network';
 
 // Title
@@ -9,16 +9,17 @@ import { network, serverUrl } from '../constants/network';
 // main start button
 // after clicking start button -> time remaining
 // when time remaining == 0 -> claim rewards calling backend (POST call: function name, time)
-const postCall = async (requestUrl, address, time, token_id = null) => {
+const postCall = async (requestUrl, address, time, token_id) => {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       address: address,
-      token_id: 2,
-      time: 5,
+      token_id: token_id,
+      time: time,
     }),
   };
+  console.log(requestOptions.body, 'body');
   let returnedData = await fetch(requestUrl, requestOptions).then((response) => response.json());
   return await returnedData;
 };
@@ -53,22 +54,23 @@ export const PopupScene = (props) => {
   const timer = (operation) => {
     let operationSelectedTime = 0;
     document.getElementById(`start${operation}`)?.setAttribute('disabled', 'disabled');
-    document.getElementById(`navbarBrand`)?.setAttribute('disabled', 'disabled');
-    document.getElementById(`navbarInventory`)?.setAttribute('disabled', 'disabled');
+    document.getElementById(`homeBtn`)?.setAttribute('disabled', 'disabled');
+    document.getElementById(`inventoryBtn`)?.setAttribute('disabled', 'disabled');
+    document.getElementById(`dropdownBtn`)?.setAttribute('disabled', 'disabled');
+    document.getElementById(`disconnectBtn`)?.setAttribute('disabled', 'disabled');
 
     // choosing the right time based on the selected operation
 
     if (operation == 'Harvest') operationSelectedTime = selectedHarvestingTime;
     else if (operation == 'Mine') operationSelectedTime = selectedMiningTime;
     else if (operation == 'Sleep') {
-      console.log(operation);
       operationSelectedTime = selectedSleepingTime;
     }
 
     // obtaining the operation's start time
 
     let startTime = new Date().getTime();
-    let endTime = addMinutes(startTime, operationSelectedTime); // to replace 0.2 with operationSelectedTime
+    let endTime = addMinutes(startTime, 0.1 /* operationSelectedTime*/); // to replace 0.2 with operationSelectedTime
 
     // setting an interval
 
@@ -94,6 +96,25 @@ export const PopupScene = (props) => {
         if (document.getElementById(`timer${operation}`) != null) {
           let claimBtn = document.createElement('button');
           claimBtn.innerHTML = `Claim rewards!`;
+          claimBtn.onclick = () => {
+            if (operation == 'Sleep')
+              postCall(`${serverUrl[network]}/rewarding-sleeping`, userAddress, selectedSleepingTime);
+            else if (operation == 'Mine')
+              postCall(
+                `${serverUrl[network]}/rewarding-mining`,
+                userAddress,
+                selectedMiningTime,
+                parseInt(selectedMiningItem)
+              );
+            else if (operation == 'Harvest')
+              postCall(
+                `${serverUrl[network]}/rewarding-harvesting`,
+                userAddress,
+                selectedHarvestingTime,
+                parseInt(selectedHarvestingItem)
+              );
+          };
+
           document.getElementById(`timer${operation}`)?.appendChild(claimBtn);
         }
       }
@@ -110,17 +131,18 @@ export const PopupScene = (props) => {
         Mine for {selectedMiningTime} minutes using<br></br>
         {selectedMiningItem &&
           mainDataDictionary['token-name'][selectedMiningItem.toString()].name.replaceAll('_', ' ')}
-        <br></br>! <br></br>
-        {/* TODO: move to claim button */}
+        !<br></br> <br></br>
         <button
           id="startMine"
-          onClick={() =>
-            postCall(
-              `${serverUrl[network]}/rewarding-mining`,
-              userSession.loadUserData().profile.stxAddress['testnet'],
-              selectedMiningTime,
-              selectedMiningItem
-            )
+          onClick={
+            () => timer(operation)
+            // () =>
+            // postCall(
+            //   `${serverUrl[network]}/rewarding-mining`,
+            //   userSession.loadUserData().profile.stxAddress['testnet'],
+            //   selectedMiningTime,
+            //   selectedMiningItem
+            // )
           }
         >
           {/* onClick={() => timer(operation)} */}
@@ -152,17 +174,7 @@ export const PopupScene = (props) => {
         Sleep for {selectedSleepingTime} minutes!
         <br></br>
         {/* TODO: move to claim button */}
-        <button
-          id="startSleep"
-          onClick={() =>
-            postCall(
-              `${serverUrl[network]}/rewarding-sleeping`,
-              userSession.loadUserData().profile.stxAddress['testnet'],
-              selectedSleepingTime
-            )
-          }
-        >
-          {/* onClick={() => timer(operation)} */}
+        <button id="startSleep" onClick={() => timer(operation)}>
           Start sleeping
         </button>
         <br></br>
