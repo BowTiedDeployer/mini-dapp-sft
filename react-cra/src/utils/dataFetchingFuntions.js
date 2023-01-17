@@ -53,7 +53,6 @@ export const fetchMainOperationData = async (operation) => {
 };
 
 export const fetchBalancesData = async (operation, userAddress) => {
-  /// e.g. operation = fighting-resources
   let operationDictionaryLocal = {};
   let mainOperationsDataLocal = '';
   let startingIndex = 0;
@@ -106,7 +105,6 @@ export const fetchStatusData = async (operation, userAddress) => {
     `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
     userAddress
   );
-  console.log(await mainOperationsDataLocal, 'DICTIONARY STATUS');
   if (mainOperationsDataLocal != '') {
     // for every returned value, keep number of resources sets (resource-id, resource-qty)
 
@@ -227,7 +225,6 @@ export const fetchTokenNameData = async (operation) => {
 
       tokenNameDataLocal.value.forEach((element) => {
         let dictionaryKey = element.value[dataFunctionNames[operation].key].value;
-        let i = 1;
         // keep only what is necessarry
 
         tokenNameDictionaryLocal = {
@@ -246,4 +243,40 @@ export const fetchTokenNameData = async (operation) => {
     }
   }
   return tokenNameDictionaryLocal;
+};
+export const fetchEnemyData = async (operation) => {
+  /// e.g. operation = fighting-resources
+  let enemyDictionaryLocal = {};
+  let enemyDataLocal = '';
+  let startingIndex = 0;
+  let total = 3;
+  let finalIndex = total;
+  let operationList = dataFunctionNames[operation].list;
+
+  while (startingIndex < operationList.length) {
+    enemyDataLocal = await fetchReadOnlySimple(
+      `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+      operationList.slice(startingIndex, finalIndex)
+    );
+    startingIndex += total;
+    finalIndex += total;
+
+    if (enemyDataLocal != '') {
+      // for every returned value, keep number of resources sets (resource-id, resource-qty)
+      enemyDataLocal.value.forEach((element) => {
+        let dictionaryKey = element.value[dataFunctionNames[operation].key].value;
+        // keep only what is necessarry
+
+        enemyDictionaryLocal = {
+          ...enemyDictionaryLocal,
+          [dictionaryKey]: {
+            defense: element.value[dataFunctionNames[operation].value].value.defense.value,
+            damage: element.value[dataFunctionNames[operation].value].value.dmg.value,
+            health: element.value[dataFunctionNames[operation].value].value.health.value,
+          },
+        };
+      });
+    }
+  }
+  return enemyDictionaryLocal;
 };

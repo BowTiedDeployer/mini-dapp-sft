@@ -45,6 +45,76 @@ export const NewScene = (props) => {
     });
     return value;
   };
+  console.log('mainDataDictionary NewScene', mainDataDictionary);
+  const userStats = {
+    health: 100,
+    damage: 0,
+    defense: 0,
+  };
+  const enemyStats = {
+    health: 100 + parseInt(mainDataDictionary['EnemyData'][nextFight.toString()]['health']),
+    damage: parseInt(mainDataDictionary['EnemyData'][nextFight.toString()]['damage']),
+    defense: parseInt(mainDataDictionary['EnemyData'][nextFight.toString()]['defense']),
+  };
+  const fightMechanics = (userStats, enemyStats) => {
+    console.log('mechanics');
+    let i = 1;
+    let attackScale = 8;
+    let userHealth = userStats.health;
+    let userAttack = userStats.damage * attackScale;
+    let userDefense = userStats.defense;
+    let enemyHealth = enemyStats.health;
+    let enemyAttack = enemyStats.damage * attackScale;
+    let enemyDefense = enemyStats.defense;
+
+    // while (userHealth > 0 && enemyHealth > 0) {
+    let attack = setInterval(function () {
+      console.log('interval');
+      if (i % 2 == 0) {
+        let healthBefore = userHealth;
+        userHealth -= enemyAttack - userDefense;
+        if (userHealth < 0) userHealth = 0;
+        let attackNo = Math.floor((i + 1) / 2);
+        let attackInfoDiv = document.createElement('div');
+        attackInfoDiv.setAttribute('class', 'right-div');
+        attackInfoDiv.setAttribute('id', 'attackInfoEnemy');
+        attackInfoDiv.innerHTML = `Enemy attack ${attackNo} 
+        <br> User's health before attack: ${healthBefore} 
+        <br> 
+        Damage:${enemyAttack - userDefense}
+        <br> 
+        Health after: ${userHealth}`;
+
+        let previousAttackInfo = document.getElementById('attackInfoEnemy');
+        if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
+        document.getElementById('fightArena')?.appendChild(attackInfoDiv);
+        console.log('userHealth', userHealth);
+      } else {
+        let healthBefore = enemyHealth;
+        enemyHealth -= userAttack - enemyDefense;
+        if (enemyHealth < 0) enemyHealth = 0;
+        let attackNo = (i + 1) / 2;
+        let attackInfoDiv = document.createElement('div');
+        attackInfoDiv.setAttribute('class', 'left-div');
+        attackInfoDiv.setAttribute('id', 'attackInfoUser');
+        attackInfoDiv.innerHTML = `Player attack ${attackNo} 
+        <br> 
+        Enemy's health before attack: ${healthBefore} 
+        <br> 
+        Damage:${userAttack - enemyDefense}
+        <br> 
+        Health after: ${enemyHealth}`;
+
+        let previousAttackInfo = document.getElementById('attackInfoUser');
+        if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
+        document.getElementById('fightArena')?.appendChild(attackInfoDiv);
+        console.log('enemyHealth', enemyHealth);
+      }
+      i++;
+      if (userHealth <= 0 || enemyHealth <= 0) clearInterval(attack);
+    }, 2000);
+    // }
+  };
   const contractCallAction = (id) => {
     doContractCall({
       network: activeNetwork,
@@ -473,7 +543,25 @@ export const NewScene = (props) => {
     Fight: (
       <div className="new-scene-container">
         <img className="new-scene-full" src={fightBackground}></img>
-        <button onClick={() => contractCallAction(nextFight)}>Start fight {nextFight}</button>
+        <div className="left-div-fight">Your stats</div>
+        <div className="center-div-fight" id="fightArena">
+          Fight
+        </div>
+        <div className="right-div-fight">
+          Enemy's stats:
+          <br></br>
+          Health:
+          {enemyStats.health}
+          <br></br>
+          Damage:
+          {enemyStats.damage}
+          <br></br>
+          Defense:
+          {enemyStats.defense}
+        </div>
+        <br></br>
+        {/* <button onClick={() => contractCallAction(nextFight)}>Start fight {nextFight}</button> */}
+        <button onClick={() => fightMechanics(userStats, enemyStats)}>Start fight {nextFight}</button>
         <button onClick={onClickBack} className="close-btn">
           Back to map
         </button>

@@ -1,9 +1,7 @@
-import { cvToHex, cvToJSON, hexToCV, stringAsciiCV, tupleCV, uintCV } from '@stacks/transactions';
-import types from '@testing-library/user-event';
-import { userAddress, userSession } from '../components/ConnectWallet';
+import { cvToHex, cvToJSON, hexToCV, tupleCV, uintCV } from '@stacks/transactions';
+import { userAddress } from '../components/ConnectWallet';
 import { network } from '../constants/network';
-import { listCV, intCV } from '@stacks/transactions';
-import { intToHexString } from './convert';
+import { listCV } from '@stacks/transactions';
 import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
 
 export const fetchReadOnlySimple = async (requestUrl, requestList) => {

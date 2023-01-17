@@ -6,6 +6,12 @@
   color: black;
   z-index: 2;
 }
+.bottom-absolute {
+  position: absolute;
+  bottom: 2%;
+  left: 45%;
+  background-color: burlywood;
+}
 .left-div {
   left: 0%;
   padding: 2%;
@@ -19,12 +25,6 @@
   border-style: dashed;
   margin-right: 5px;
 }
-.bottom-absolute {
-  position: absolute;
-  bottom: 2%;
-  left: 45%;
-  background-color: burlywood;
-}
 .right-div {
   padding: 2%;
   width: 50%;
@@ -37,6 +37,45 @@
   border: #000;
   border-style: dashed;
   margin-left: 5px;
+}
+.left-div-fight {
+  left: 0%;
+  padding: 2%;
+  width: 25%;
+  height: 76%;
+  top: 15%;
+  float: left;
+  z-index: 2;
+  position: absolute;
+  border: #000;
+  border-style: dashed;
+  margin-right: 5px;
+}
+.right-div-fight {
+  padding: 2%;
+  width: 25%;
+  height: 76%;
+  top: 15%;
+  right: 0%;
+  float: right;
+  z-index: 2;
+  position: absolute;
+  border: #000;
+  border-style: dashed;
+  margin-left: 0px;
+}
+.center-div-fight {
+  padding: 2%;
+  width: 50%;
+  height: 76%;
+  top: 15%;
+  left: 25%;
+  float: right;
+  z-index: 2;
+  position: absolute;
+  border: #000;
+  border-style: dashed;
+  margin-left: 0px;
 }
 .container-div {
   position: relative;

@@ -6,6 +6,7 @@ import NavBar from './NavBar';
 import { NewScene } from './NewScene';
 import {
   fetchBalancesData,
+  fetchEnemyData,
   fetchMainOperationData,
   fetchStatusData,
   fetchTokenNameData,
@@ -44,6 +45,40 @@ export const MainMenu = () => {
   const [hasRespondedData, setHasRespondedData] = useState(false);
   const [closedStarterKitPopup, setClosedStarterKitPopup] = useState(false);
   const { doContractCall } = useConnect();
+
+  const checkBalanceSelectedItems = () => {
+    let sword = localStorage.getItem('selectedSword');
+    let armor = localStorage.getItem('selectedArmor');
+    let shield = localStorage.getItem('selectedShield');
+    let helmet = localStorage.getItem('selectedHelmet');
+    let shoes = localStorage.getItem('selectedShoes');
+
+    if (sword && sword != '0')
+      if (mainDataDictionary)
+        if (mainDataDictionary['balances']) {
+          if (mainDataDictionary['balances'][sword] == '0') localStorage.setItem('selectedSword', '0');
+        }
+    if (armor && armor != '0')
+      if (mainDataDictionary)
+        if (mainDataDictionary['balances']) {
+          if (mainDataDictionary['balances'][armor] == '0') localStorage.setItem('selectedArmor', '0');
+        }
+    if (shield && shield != '0')
+      if (mainDataDictionary)
+        if (mainDataDictionary['balances']) {
+          if (mainDataDictionary['balances'][shield] == '0') localStorage.setItem('selectedShield', '0');
+        }
+    if (helmet && helmet != '0')
+      if (mainDataDictionary)
+        if (mainDataDictionary['balances']) {
+          if (mainDataDictionary['balances'][helmet] == '0') localStorage.setItem('selectedHelmet', '0');
+        }
+    if (shoes && shoes != '0')
+      if (mainDataDictionary)
+        if (mainDataDictionary['balances']) {
+          if (mainDataDictionary['balances'][shoes] == '0') localStorage.setItem('selectedShoes', '0');
+        }
+  };
   const miningFunction = (time) => {
     setSelectedMiningTime(time);
     setOperation('Mine');
@@ -111,7 +146,7 @@ export const MainMenu = () => {
         [item]: `${baseImgUrl}/${item}.png`,
       };
     });
-
+    mainDataDictionaryLocal['EnemyData'] = await fetchEnemyData('enemyData');
     mainDataDictionaryLocal['fighting-status'] = await fetchStatusData('fightStatus', userAddress);
 
     mainDataDictionaryLocal['starter-kit-status'] = await fetchStatusData('starterKitStatus', userAddress);
@@ -139,6 +174,7 @@ export const MainMenu = () => {
     if (mainDataDictionaryLocal) {
       setMainDataDictionary(mainDataDictionaryLocal);
       setHasRespondedData(true);
+      checkBalanceSelectedItems();
     }
   }, [setMainDataDictionary]);
 
@@ -348,7 +384,6 @@ export const MainMenu = () => {
                       );
                     })}
                     <br />
-                    {/* <button onClick={sleepingFunction}>Sleep</button> */}
                   </span>
                 </div>
               </span>

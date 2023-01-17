@@ -84,4 +84,10 @@ export const dataFunctionNames = {
     value: 'claimed',
     list: [],
   },
+  enemyData: {
+    functionName: 'get-all-enemy-data',
+    key: 'fight-number',
+    value: 'enemy-data',
+    list: fightingList,
+  },
 };
