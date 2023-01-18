@@ -46,38 +46,53 @@ export const MainMenu = () => {
   const [closedStarterKitPopup, setClosedStarterKitPopup] = useState(false);
   const { doContractCall } = useConnect();
 
-  const checkBalanceSelectedItems = () => {
+  const checkBalanceSelectedItems = (dataDictionary) => {
     let sword = localStorage.getItem('selectedSword');
     let armor = localStorage.getItem('selectedArmor');
     let shield = localStorage.getItem('selectedShield');
     let helmet = localStorage.getItem('selectedHelmet');
     let shoes = localStorage.getItem('selectedShoes');
-
-    if (sword && sword != '0')
-      if (mainDataDictionary)
-        if (mainDataDictionary['balances']) {
-          if (mainDataDictionary['balances'][sword] == '0') localStorage.setItem('selectedSword', '0');
+    if (sword && sword != '') {
+      if (dataDictionary['balances']) {
+        // if (dataDictionary)
+        if (dataDictionary['balances'][sword] == '0') {
+          localStorage.setItem('selectedSword', '');
+          setSelectedSword('');
         }
-    if (armor && armor != '0')
-      if (mainDataDictionary)
-        if (mainDataDictionary['balances']) {
-          if (mainDataDictionary['balances'][armor] == '0') localStorage.setItem('selectedArmor', '0');
+      }
+    } else localStorage.setItem('selectedSword', '');
+    if (armor && armor != '') {
+      if (dataDictionary['balances']) {
+        if (dataDictionary['balances'][armor] == '0') {
+          localStorage.setItem('selectedArmor', '');
+          setSelectedArmor('');
         }
-    if (shield && shield != '0')
-      if (mainDataDictionary)
-        if (mainDataDictionary['balances']) {
-          if (mainDataDictionary['balances'][shield] == '0') localStorage.setItem('selectedShield', '0');
+      }
+    } else localStorage.setItem('selectedArmor', '');
+    if (shield && shield != '') {
+      if (dataDictionary['balances']) {
+        if (dataDictionary['balances'][shield] == '0') {
+          localStorage.setItem('selectedShield', '');
+          setSelectedShield('');
         }
-    if (helmet && helmet != '0')
-      if (mainDataDictionary)
-        if (mainDataDictionary['balances']) {
-          if (mainDataDictionary['balances'][helmet] == '0') localStorage.setItem('selectedHelmet', '0');
+      }
+    } else localStorage.setItem('selectedShield', '');
+    if (helmet && helmet != '') {
+      if (dataDictionary['balances']) {
+        if (dataDictionary['balances'][helmet] == '0') {
+          localStorage.setItem('selectedHelmet', '');
+          setSelectedHelmet('');
         }
-    if (shoes && shoes != '0')
-      if (mainDataDictionary)
-        if (mainDataDictionary['balances']) {
-          if (mainDataDictionary['balances'][shoes] == '0') localStorage.setItem('selectedShoes', '0');
+      }
+    } else localStorage.setItem('selectedHelmet', '');
+    if (shoes && shoes != '') {
+      if (dataDictionary['balances']) {
+        if (dataDictionary['balances'][shoes] == '0') {
+          localStorage.setItem('selectedShoes', '');
+          setSelectedShoes('');
         }
+      }
+    } else localStorage.setItem('selectedShoes', '');
   };
   const miningFunction = (time) => {
     setSelectedMiningTime(time);
@@ -174,7 +189,7 @@ export const MainMenu = () => {
     if (mainDataDictionaryLocal) {
       setMainDataDictionary(mainDataDictionaryLocal);
       setHasRespondedData(true);
-      checkBalanceSelectedItems();
+      checkBalanceSelectedItems(mainDataDictionaryLocal);
     }
   }, [setMainDataDictionary]);
 

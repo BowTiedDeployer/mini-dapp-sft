@@ -34,6 +34,8 @@ export const NewScene = (props) => {
   const [selectedType, setSelectedType] = useState('sword');
   const [selectedItem, setSelectedItem] = useState(0);
   const craftLikeOperationList = ['Craft', 'LevelUp', 'Shop'];
+  const attackScale = 8;
+
   const checkBalanceByOperation = (itemId, operation) => {
     let value = true;
     Object.keys(mainDataDictionary[operation][itemId]).forEach((resourceSet) => {
@@ -45,70 +47,114 @@ export const NewScene = (props) => {
     });
     return value;
   };
-  console.log('mainDataDictionary NewScene', mainDataDictionary);
+  console.log('mainDataDictionary NewScene', mainDataDictionary, selectedSword);
   const userStats = {
-    health: 100,
-    damage: 0,
-    defense: 0,
+    health:
+      100 +
+      (selectedArmor != '' ? parseInt(mainDataDictionary['token-name'][selectedArmor].values.health) : 0) +
+      (selectedHelmet != '' ? parseInt(mainDataDictionary['token-name'][selectedHelmet].values.health) : 0),
+    damage: selectedSword != '' ? mainDataDictionary['token-name'][selectedSword].values.damage : 0,
+    defense:
+      (selectedArmor != '' ? parseInt(mainDataDictionary['token-name'][selectedArmor].values.defense) : 0) +
+      (selectedShield != '' ? parseInt(mainDataDictionary['token-name'][selectedShield].values.defense) : 0), //shield armor
   };
   const enemyStats = {
     health: 100 + parseInt(mainDataDictionary['EnemyData'][nextFight.toString()]['health']),
     damage: parseInt(mainDataDictionary['EnemyData'][nextFight.toString()]['damage']),
     defense: parseInt(mainDataDictionary['EnemyData'][nextFight.toString()]['defense']),
   };
+  function getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
   const fightMechanics = (userStats, enemyStats) => {
-    console.log('mechanics');
+    let randomRatio = 0.2;
     let i = 1;
-    let attackScale = 8;
     let userHealth = userStats.health;
     let userAttack = userStats.damage * attackScale;
     let userDefense = userStats.defense;
     let enemyHealth = enemyStats.health;
     let enemyAttack = enemyStats.damage * attackScale;
     let enemyDefense = enemyStats.defense;
-
+    let firstAttack = 0;
+    let firstDefense = 0;
+    let secondAttack = 0;
+    let secondDefense = 0;
+    let firstAttacker = '';
+    let secondAttacker = '';
+    let randomStart = getRndInteger(0, 1);
+    if (randomStart == 0) {
+      firstAttack = enemyAttack;
+      firstDefense = userDefense;
+      secondAttack = userAttack;
+      secondDefense = enemyDefense;
+      firstAttacker = 'Enemy';
+      secondAttacker = 'User';
+    } else {
+      firstAttack = userAttack;
+      firstDefense = enemyDefense;
+      secondAttack = enemyAttack;
+      secondDefense = userDefense;
+      firstAttacker = 'User';
+      secondAttacker = 'Enemy';
+    }
     // while (userHealth > 0 && enemyHealth > 0) {
     let attack = setInterval(function () {
-      console.log('interval');
+      let rndFirstAttack = getRndInteger(
+        Math.floor(enemyAttack * (1 - randomRatio)),
+        Math.ceil(enemyAttack * (1 + randomRatio))
+      );
+      let rndSecondAttack = getRndInteger(
+        Math.floor(secondAttack * (1 - randomRatio)),
+        Math.ceil(secondAttack * (1 + randomRatio))
+      );
+      let rndFirstDefense = getRndInteger(
+        Math.floor(firstDefense * (1 - randomRatio)),
+        Math.ceil(firstDefense * (1 + randomRatio))
+      );
+      let rndSecondDefense = getRndInteger(
+        Math.floor(secondDefense * (1 - randomRatio)),
+        Math.ceil(secondDefense * (1 + randomRatio))
+      );
+
       if (i % 2 == 0) {
+        let attResult = rndFirstAttack - rndSecondDefense >= 0 ? rndFirstAttack - rndSecondDefense : 0;
         let healthBefore = userHealth;
-        userHealth -= enemyAttack - userDefense;
+        userHealth -= attResult;
         if (userHealth < 0) userHealth = 0;
         let attackNo = Math.floor((i + 1) / 2);
         let attackInfoDiv = document.createElement('div');
         attackInfoDiv.setAttribute('class', 'right-div');
         attackInfoDiv.setAttribute('id', 'attackInfoEnemy');
-        attackInfoDiv.innerHTML = `Enemy attack ${attackNo} 
-        <br> User's health before attack: ${healthBefore} 
+        attackInfoDiv.innerHTML = `${secondAttacker} attack ${attackNo} 
+        <br> ${firstAttacker}'s health before attack: ${healthBefore} 
         <br> 
-        Damage:${enemyAttack - userDefense}
+        Damage:${attResult}
         <br> 
         Health after: ${userHealth}`;
 
         let previousAttackInfo = document.getElementById('attackInfoEnemy');
         if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
         document.getElementById('fightArena')?.appendChild(attackInfoDiv);
-        console.log('userHealth', userHealth);
       } else {
+        let attResult = rndSecondAttack - rndFirstDefense >= 0 ? rndSecondAttack - rndFirstDefense : 0;
         let healthBefore = enemyHealth;
-        enemyHealth -= userAttack - enemyDefense;
+        enemyHealth -= attResult;
         if (enemyHealth < 0) enemyHealth = 0;
         let attackNo = (i + 1) / 2;
         let attackInfoDiv = document.createElement('div');
         attackInfoDiv.setAttribute('class', 'left-div');
         attackInfoDiv.setAttribute('id', 'attackInfoUser');
-        attackInfoDiv.innerHTML = `Player attack ${attackNo} 
+        attackInfoDiv.innerHTML = `${firstAttacker} attack ${attackNo} 
         <br> 
-        Enemy's health before attack: ${healthBefore} 
+        ${secondAttacker}'s health before attack: ${healthBefore} 
         <br> 
-        Damage:${userAttack - enemyDefense}
+        Damage: ${attResult}
         <br> 
         Health after: ${enemyHealth}`;
 
         let previousAttackInfo = document.getElementById('attackInfoUser');
         if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
         document.getElementById('fightArena')?.appendChild(attackInfoDiv);
-        console.log('enemyHealth', enemyHealth);
       }
       i++;
       if (userHealth <= 0 || enemyHealth <= 0) clearInterval(attack);
@@ -543,7 +589,17 @@ export const NewScene = (props) => {
     Fight: (
       <div className="new-scene-container">
         <img className="new-scene-full" src={fightBackground}></img>
-        <div className="left-div-fight">Your stats</div>
+        <div className="left-div-fight">
+          Your stats<br></br>
+          Health:
+          {userStats.health}
+          <br></br>
+          Damage:
+          {userStats.damage * attackScale}
+          <br></br>
+          Defense:
+          {userStats.defense}
+        </div>
         <div className="center-div-fight" id="fightArena">
           Fight
         </div>
@@ -554,7 +610,7 @@ export const NewScene = (props) => {
           {enemyStats.health}
           <br></br>
           Damage:
-          {enemyStats.damage}
+          {enemyStats.damage * attackScale}
           <br></br>
           Defense:
           {enemyStats.defense}
