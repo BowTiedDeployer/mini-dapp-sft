@@ -81,6 +81,10 @@ export const NewScene = (props) => {
     let secondDefense = 0;
     let firstAttacker = '';
     let secondAttacker = '';
+    let firstAttackerHP = 0;
+    let secondAttackerHP = 0;
+    let firstHealthAffected = '';
+    let secondHealthAffected = '';
     let randomStart = getRndInteger(0, 1);
     if (randomStart == 0) {
       firstAttack = enemyAttack;
@@ -89,6 +93,10 @@ export const NewScene = (props) => {
       secondDefense = enemyDefense;
       firstAttacker = 'Enemy';
       secondAttacker = 'User';
+      firstAttackerHP = enemyHealth;
+      secondAttackerHP = userHealth;
+      firstHealthAffected = 'userHealth';
+      secondHealthAffected = 'enemyHealth';
     } else {
       firstAttack = userAttack;
       firstDefense = enemyDefense;
@@ -96,7 +104,13 @@ export const NewScene = (props) => {
       secondDefense = userDefense;
       firstAttacker = 'User';
       secondAttacker = 'Enemy';
+      firstAttackerHP = userHealth;
+      secondAttackerHP = enemyHealth;
+      firstHealthAffected = 'enemyHealth';
+      secondHealthAffected = 'userHealth';
     }
+    let firstMaxHealth = firstAttackerHP;
+    let secondMaxHealth = secondAttackerHP;
     // while (userHealth > 0 && enemyHealth > 0) {
     let attack = setInterval(function () {
       let rndFirstAttack = getRndInteger(
@@ -117,47 +131,46 @@ export const NewScene = (props) => {
       );
 
       if (i % 2 == 0) {
-        let attResult = rndFirstAttack - rndSecondDefense >= 0 ? rndFirstAttack - rndSecondDefense : 0;
-        let healthBefore = userHealth;
-        userHealth -= attResult;
-        if (userHealth < 0) userHealth = 0;
+        console.log(firstAttack, firstDefense);
+        let attResult = rndSecondAttack - rndSecondDefense >= 0 ? rndSecondAttack - rndSecondDefense : 0;
+        let healthBefore = firstAttackerHP;
+
+        firstAttackerHP -= attResult;
+
+        if (firstAttackerHP < 0) firstAttackerHP = 0;
         let attackNo = Math.floor((i + 1) / 2);
         let attackInfoDiv = document.createElement('div');
-        attackInfoDiv.setAttribute('class', 'right-div');
+        // attackInfoDiv.setAttribute('class', 'right-div');
         attackInfoDiv.setAttribute('id', 'attackInfoEnemy');
-        attackInfoDiv.innerHTML = `${secondAttacker} attack ${attackNo} 
-        <br> ${firstAttacker}'s health before attack: ${healthBefore} 
+        attackInfoDiv.innerHTML = `${secondAttacker} attack ${attackNo} deals ${attResult} damage
         <br> 
-        Damage:${attResult}
-        <br> 
-        Health after: ${userHealth}`;
-
-        let previousAttackInfo = document.getElementById('attackInfoEnemy');
-        if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
+        `;
+        let healthDiv = document.getElementById(secondHealthAffected);
+        if (healthDiv != null) healthDiv.innerHTML = `Health:<br>${firstAttackerHP}/${firstMaxHealth}`;
+        // let previousAttackInfo = document.getElementById('attackInfoEnemy');
+        // if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
         document.getElementById('fightArena')?.appendChild(attackInfoDiv);
       } else {
-        let attResult = rndSecondAttack - rndFirstDefense >= 0 ? rndSecondAttack - rndFirstDefense : 0;
-        let healthBefore = enemyHealth;
-        enemyHealth -= attResult;
-        if (enemyHealth < 0) enemyHealth = 0;
+        let attResult = rndFirstAttack - rndFirstDefense >= 0 ? rndFirstAttack - rndFirstDefense : 0;
+        let healthBefore = secondAttackerHP;
+        secondAttackerHP -= attResult;
+        if (secondAttackerHP < 0) secondAttackerHP = 0;
         let attackNo = (i + 1) / 2;
         let attackInfoDiv = document.createElement('div');
-        attackInfoDiv.setAttribute('class', 'left-div');
+        // attackInfoDiv.setAttribute('class', 'left-div');
         attackInfoDiv.setAttribute('id', 'attackInfoUser');
-        attackInfoDiv.innerHTML = `${firstAttacker} attack ${attackNo} 
-        <br> 
-        ${secondAttacker}'s health before attack: ${healthBefore} 
-        <br> 
-        Damage: ${attResult}
-        <br> 
-        Health after: ${enemyHealth}`;
+        attackInfoDiv.innerHTML = `${firstAttacker} attack ${attackNo} deals ${attResult} Damage. 
+        <br> `;
 
-        let previousAttackInfo = document.getElementById('attackInfoUser');
-        if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
+        let healthDiv = document.getElementById(firstHealthAffected);
+        if (healthDiv != null) healthDiv.innerHTML = `Health:<br>${secondAttackerHP}/${secondMaxHealth}`;
+
+        // let previousAttackInfo = document.getElementById('attackInfoUser');
+        // if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
         document.getElementById('fightArena')?.appendChild(attackInfoDiv);
       }
       i++;
-      if (userHealth <= 0 || enemyHealth <= 0) clearInterval(attack);
+      if (firstAttackerHP <= 0 || secondAttackerHP <= 0) clearInterval(attack);
     }, 2000);
     // }
   };
@@ -590,15 +603,16 @@ export const NewScene = (props) => {
       <div className="new-scene-container">
         <img className="new-scene-full" src={fightBackground}></img>
         <div className="left-div-fight">
-          Your stats<br></br>
-          Health:
-          {userStats.health}
+          Your stats
           <br></br>
-          Damage:
+          Attack:
           {userStats.damage * attackScale}
           <br></br>
           Defense:
           {userStats.defense}
+          <br></br>
+          <div id="userHealth">Health:</div>
+          {userStats.health}
         </div>
         <div className="center-div-fight" id="fightArena">
           Fight
@@ -606,14 +620,14 @@ export const NewScene = (props) => {
         <div className="right-div-fight">
           Enemy's stats:
           <br></br>
-          Health:
-          {enemyStats.health}
-          <br></br>
-          Damage:
+          Attack:
           {enemyStats.damage * attackScale}
           <br></br>
           Defense:
           {enemyStats.defense}
+          <br></br>
+          <div id="enemyHealth">Health:</div>
+          {enemyStats.health}
         </div>
         <br></br>
         {/* <button onClick={() => contractCallAction(nextFight)}>Start fight {nextFight}</button> */}
