@@ -3,7 +3,7 @@ import { useConnect } from '@stacks/connect-react';
 import NavBar from './NavBar';
 import shopBackground from '../resources/shop.png';
 import fightBackground from '../resources/battle.png';
-import { baseImgUrl } from '../constants/baseImgUrl';
+import { baseImgUrl, basePinataUrl } from '../constants/baseImgUrl';
 import { acquisitionList, craftingList, itemTypeDictionary, levelUpList } from '../constants/dataLists';
 import { StacksMainnet, StacksMocknet, StacksTestnet } from '@stacks/network';
 import { network } from '../constants/network';
@@ -184,6 +184,7 @@ export const NewScene = (props) => {
       functionArgs: [uintCV(id)],
       postConditionMode: PostConditionMode.Allow,
       onFinish: (data) => {
+        // call newScene -> fight, start fight
         console.log(`Finished ${operation}`, data);
         console.log(`Check transaction with txId: ${data.txId}`);
       },
@@ -613,6 +614,46 @@ export const NewScene = (props) => {
           <br></br>
           <div id="userHealth">Health:</div>
           {userStats.health}
+          <br></br>
+          <br></br>
+          <div className="grid-holder">
+            <div className="grid-container">
+              <div className="grid-item"></div>
+              <div className="grid-item">
+                <img
+                  className="img-grid"
+                  src={`${basePinataUrl}/${mainDataDictionary['itemsImages'][selectedHelmet]}`}
+                ></img>
+              </div>
+              <div className="grid-item"></div>
+              <div className="grid-item">
+                <img
+                  className="img-grid"
+                  src={`${basePinataUrl}/${mainDataDictionary['itemsImages'][selectedShield]}`}
+                ></img>
+              </div>
+              <div className="grid-item">
+                <img
+                  className="img-grid"
+                  src={`${basePinataUrl}/${mainDataDictionary['itemsImages'][selectedArmor]}`}
+                ></img>
+              </div>
+              <div className="grid-item">
+                <img
+                  className="img-grid"
+                  src={`${basePinataUrl}/${mainDataDictionary['itemsImages'][selectedSword]}`}
+                ></img>
+              </div>
+              <div className="grid-item"> </div>
+              <div className="grid-item">
+                <img
+                  className="img-grid"
+                  src={`${basePinataUrl}/${mainDataDictionary['itemsImages'][selectedShoes]}`}
+                ></img>
+              </div>
+              <div className="grid-item"> </div>
+            </div>
+          </div>
         </div>
         <div className="center-div-fight" id="fightArena">
           Fight
@@ -706,155 +747,157 @@ export const NewScene = (props) => {
           <br></br>
           <button onClick={unequipItems}>Unequip</button>
           <br></br>
-          {
-            <div>
-              Helmet:
-              {selectedHelmet && (
-                <div className="tooltipTopInventory">
-                  <figure>
-                    <img
-                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                        mainDataDictionary.itemsImages[parseInt(selectedHelmet)]
-                      }`}
-                    ></img>
-                  </figure>
-                  <span className="tooltipTextTopInventory">
-                    <div>
-                      {mainDataDictionary['token-name'][selectedHelmet]['name'].replaceAll('_', ' ').toUpperCase()}
-                      <br></br>
-                      <br></br>
-                      STATISTICS
-                      <br></br>
-                      <br></br>
-                      Damage: {mainDataDictionary['token-name'][selectedHelmet].values.damage}
-                      <br></br>
-                      Defence: {mainDataDictionary['token-name'][selectedHelmet].values.defense}
-                      <br></br>
-                      Health: {mainDataDictionary['token-name'][selectedHelmet].values.health}
-                    </div>
-                  </span>
-                </div>
-              )}
-              {!selectedHelmet && <div>No helmet selected</div>}
-              <br></br>
-              Armor:
-              {selectedArmor && (
-                <div className="tooltipTopInventory">
-                  <figure>
-                    <img
-                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                        mainDataDictionary.itemsImages[parseInt(selectedArmor)]
-                      }`}
-                    ></img>
-                  </figure>
-                  <span className="tooltipTextTopInventory">
-                    <div>
-                      {mainDataDictionary['token-name'][selectedArmor]['name'].replaceAll('_', ' ').toUpperCase()}
-                      <br></br>
-                      <br></br>
-                      STATISTICS
-                      <br></br>
-                      <br></br>
-                      Damage: {mainDataDictionary['token-name'][selectedArmor].values.damage}
-                      <br></br>
-                      Defence: {mainDataDictionary['token-name'][selectedArmor].values.defense}
-                      <br></br>
-                      Health: {mainDataDictionary['token-name'][selectedArmor].values.health}
-                    </div>
-                  </span>
-                </div>
-              )}
-              {!selectedArmor && <div>No armor selected</div>}
-              <br></br>
-              Sword:
-              {selectedSword && (
-                <div className="tooltipTopInventory">
-                  <figure>
-                    <img
-                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                        mainDataDictionary['itemsImages'][parseInt(selectedSword)]
-                      }`}
-                    ></img>
-                  </figure>
-                  <span className="tooltipTextTopInventory">
-                    <div>
-                      {mainDataDictionary['token-name'][selectedSword]['name'].replaceAll('_', ' ').toUpperCase()}
-                      <br></br>
-                      <br></br>
-                      STATISTICS
-                      <br></br>
-                      <br></br>
-                      Damage: {mainDataDictionary['token-name'][selectedSword].values.damage}
-                      <br></br>
-                      Defence: {mainDataDictionary['token-name'][selectedSword].values.defense}
-                      <br></br>
-                      Health: {mainDataDictionary['token-name'][selectedSword].values.health}
-                    </div>
-                  </span>
-                </div>
-              )}
-              {!selectedSword && <div>No sword selected</div>}
-              <br></br>
-              Shield:
-              {selectedShield && (
-                <div className="tooltipTopInventory">
-                  <figure>
-                    <img
-                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                        mainDataDictionary.itemsImages[parseInt(selectedShield)]
-                      }`}
-                    ></img>
-                  </figure>
-                  <span className="tooltipTextTopInventory">
-                    <div>
-                      {mainDataDictionary['token-name'][selectedShield]['name'].replaceAll('_', ' ').toUpperCase()}
-                      <br></br>
-                      <br></br>
-                      STATISTICS
-                      <br></br>
-                      <br></br>
-                      Damage: {mainDataDictionary['token-name'][selectedShield].values.damage}
-                      <br></br>
-                      Defence: {mainDataDictionary['token-name'][selectedShield].values.defense}
-                      <br></br>
-                      Health: {mainDataDictionary['token-name'][selectedShield].values.health}
-                    </div>
-                  </span>
-                </div>
-              )}
-              {!selectedShield && <div>No shield selected</div>}
-              <br></br>
-              Shoes:
-              {selectedShoes && (
-                <div className="tooltipTopInventory">
-                  <figure>
-                    <img
-                      src={`https://stacksgamefi.mypinata.cloud/ipfs/${
-                        mainDataDictionary.itemsImages[parseInt(selectedShoes)]
-                      }`}
-                    ></img>
-                  </figure>
-                  <span className="tooltipTextTopInventory">
-                    <div>
-                      {mainDataDictionary['token-name'][selectedShoes]['name'].replaceAll('_', ' ').toUpperCase()}
-                      <br></br>
-                      <br></br>
-                      STATISTICS
-                      <br></br>
-                      <br></br>
-                      Damage: {mainDataDictionary['token-name'][selectedShoes].values.damage}
-                      <br></br>
-                      Defence: {mainDataDictionary['token-name'][selectedShoes].values.defense}
-                      <br></br>
-                      Health: {mainDataDictionary['token-name'][selectedShoes].values.health}
-                    </div>
-                  </span>
-                </div>
-              )}
-              {!selectedShoes && <div>No shoes selected</div>}
-              <br></br>
+          <div className="grid-holder">
+            <div className="grid-container">
+              <div className="grid-item"></div>
+              <div className="grid-item">
+                {selectedHelmet && (
+                  <div className="tooltipTopInventory">
+                    <figure>
+                      <img
+                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                          mainDataDictionary.itemsImages[parseInt(selectedHelmet)]
+                        }`}
+                      ></img>
+                    </figure>
+                    <span className="tooltipTextTopInventory">
+                      <div>
+                        {mainDataDictionary['token-name'][selectedHelmet]['name'].replaceAll('_', ' ').toUpperCase()}
+                        <br></br>
+                        <br></br>
+                        STATISTICS
+                        <br></br>
+                        <br></br>
+                        Damage: {mainDataDictionary['token-name'][selectedHelmet].values.damage}
+                        <br></br>
+                        Defence: {mainDataDictionary['token-name'][selectedHelmet].values.defense}
+                        <br></br>
+                        Health: {mainDataDictionary['token-name'][selectedHelmet].values.health}
+                      </div>
+                    </span>
+                  </div>
+                )}
+                {!selectedHelmet && <div>No helmet</div>}
+              </div>
+              <div className="grid-item"></div>
+              <div className="grid-item">
+                {selectedShield && (
+                  <div className="tooltipTopInventory">
+                    <figure>
+                      <img
+                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                          mainDataDictionary.itemsImages[parseInt(selectedShield)]
+                        }`}
+                      ></img>
+                    </figure>
+                    <span className="tooltipTextTopInventory">
+                      <div>
+                        {mainDataDictionary['token-name'][selectedShield]['name'].replaceAll('_', ' ').toUpperCase()}
+                        <br></br>
+                        <br></br>
+                        STATISTICS
+                        <br></br>
+                        <br></br>
+                        Damage: {mainDataDictionary['token-name'][selectedShield].values.damage}
+                        <br></br>
+                        Defence: {mainDataDictionary['token-name'][selectedShield].values.defense}
+                        <br></br>
+                        Health: {mainDataDictionary['token-name'][selectedShield].values.health}
+                      </div>
+                    </span>
+                  </div>
+                )}
+                {!selectedHelmet && <div>No shield</div>}
+              </div>
+              <div className="grid-item">
+                {selectedArmor && (
+                  <div className="tooltipTopInventory">
+                    <figure>
+                      <img
+                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                          mainDataDictionary.itemsImages[parseInt(selectedArmor)]
+                        }`}
+                      ></img>
+                    </figure>
+                    <span className="tooltipTextTopInventory">
+                      <div>
+                        {mainDataDictionary['token-name'][selectedArmor]['name'].replaceAll('_', ' ').toUpperCase()}
+                        <br></br>
+                        <br></br>
+                        STATISTICS
+                        <br></br>
+                        <br></br>
+                        Damage: {mainDataDictionary['token-name'][selectedArmor].values.damage}
+                        <br></br>
+                        Defence: {mainDataDictionary['token-name'][selectedArmor].values.defense}
+                        <br></br>
+                        Health: {mainDataDictionary['token-name'][selectedArmor].values.health}
+                      </div>
+                    </span>
+                  </div>
+                )}
+                {!selectedHelmet && <div>No armor</div>}
+              </div>
+              <div className="grid-item">
+                {selectedSword && (
+                  <div className="tooltipTopInventory">
+                    <figure>
+                      <img
+                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                          mainDataDictionary['itemsImages'][parseInt(selectedSword)]
+                        }`}
+                      ></img>
+                    </figure>
+                    <span className="tooltipTextTopInventory">
+                      <div>
+                        {mainDataDictionary['token-name'][selectedSword]['name'].replaceAll('_', ' ').toUpperCase()}
+                        <br></br>
+                        <br></br>
+                        STATISTICS
+                        <br></br>
+                        <br></br>
+                        Damage: {mainDataDictionary['token-name'][selectedSword].values.damage}
+                        <br></br>
+                        Defence: {mainDataDictionary['token-name'][selectedSword].values.defense}
+                        <br></br>
+                        Health: {mainDataDictionary['token-name'][selectedSword].values.health}
+                      </div>
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="grid-item"> </div>
+              <div className="grid-item">
+                {selectedShoes && (
+                  <div className="tooltipTopInventory">
+                    <figure>
+                      <img
+                        src={`https://stacksgamefi.mypinata.cloud/ipfs/${
+                          mainDataDictionary.itemsImages[parseInt(selectedShoes)]
+                        }`}
+                      ></img>
+                    </figure>
+                    <span className="tooltipTextTopInventory">
+                      <div>
+                        {mainDataDictionary['token-name'][selectedShoes]['name'].replaceAll('_', ' ').toUpperCase()}
+                        <br></br>
+                        <br></br>
+                        STATISTICS
+                        <br></br>
+                        <br></br>
+                        Damage: {mainDataDictionary['token-name'][selectedShoes].values.damage}
+                        <br></br>
+                        Defence: {mainDataDictionary['token-name'][selectedShoes].values.defense}
+                        <br></br>
+                        Health: {mainDataDictionary['token-name'][selectedShoes].values.health}
+                      </div>
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="grid-item"> </div>
             </div>
-          }
+          </div>
         </div>
         <button className="close-btn" onClick={onClickBack}>
           Back to map

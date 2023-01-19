@@ -26,26 +26,28 @@ export const NavBar = (props) => {
       <ul>
         <li>
           <span>
-            <button id="homeBtn" onClick={onClickBack}>
+            <button id="homeBtn" className="home-btn" onClick={onClickBack}>
               Home
             </button>
           </span>
         </li>
         <li>
           <span>
-            <button id="inventoryBtn" onClick={inventoryFunction}>
+            <button id="inventoryBtn" className="nav-btn" onClick={inventoryFunction}>
               Inventory
             </button>
           </span>
         </li>
         <li>
           <span>
-            <button id="dropdownBtn">Dropdown</button>
+            <button id="dropdownBtn" className="nav-btn">
+              Dropdown
+            </button>
           </span>
         </li>
         <li>
           <span>
-            <button id="disconnectBtn" onClick={disconnect}>
+            <button id="disconnectBtn" className="nav-btn" onClick={disconnect}>
               Disconnect Wallet
             </button>
           </span>

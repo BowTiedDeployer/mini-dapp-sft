@@ -24,6 +24,7 @@
   border: #000;
   border-style: dashed;
   margin-right: 5px;
+  text-align: center;
 }
 .right-div {
   padding: 2%;
@@ -411,4 +412,44 @@ li {
 
 li {
   display: inline;
+}
+.grid-holder {
+  display: inline-block;
+}
+.grid-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  background-color: burlywood;
+  padding: 10px;
+  width: fit-content;
+}
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+
+  /* width: ; */
+}
+.img-grid-fight {
+  width: 32px;
+}
+.img-grid-inventory {
+  width: 64px;
+}
+.home-btn {
+  /* opacity: 0%; */
+  background-color: transparent;
+  border: transparent;
+  color: white;
+  /* width: 100%; */
+}
+.nav-btn {
+  /* opacity: 0%; */
+  /* width: 100%; */
+  background-color: transparent;
+  border: transparent;
+  color: white;
 }

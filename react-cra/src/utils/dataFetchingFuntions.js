@@ -1,5 +1,7 @@
 import { contractAddress, contractName } from '../constants/contract';
 import { dataFunctionNames } from '../constants/dataFunctionNames';
+import { network } from '../constants/network';
+import { readOnlyBase } from '../constants/readOnlyBaseURL';
 import {
   fetchReadOnlySimple,
   fetchReadOnlyMining,
@@ -19,7 +21,7 @@ export const fetchMainOperationData = async (operation) => {
 
   while (startingIndex < operationList.length) {
     mainOperationsDataLocal = await fetchReadOnlySimple(
-      `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+      `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
       operationList.slice(startingIndex, finalIndex)
     );
     startingIndex += total;
@@ -62,7 +64,7 @@ export const fetchBalancesData = async (operation, userAddress) => {
 
   while (startingIndex < operationList.length) {
     mainOperationsDataLocal = await fetchReadOnlyBalances(
-      `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+      `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
       operationList.slice(startingIndex, finalIndex),
       userAddress
     );
@@ -102,7 +104,7 @@ export const fetchStatusData = async (operation, userAddress) => {
   let operationList = dataFunctionNames[operation].list;
 
   mainOperationsDataLocal = await fetchReadOnlyStatus(
-    `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+    `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
     userAddress
   );
   if (mainOperationsDataLocal != '') {
@@ -144,13 +146,13 @@ export const fetchTupleOperationData = async (operation) => {
   while (startingIndex < operationList.length) {
     if (operation == 'Mine')
       rewardsDataLocal = await fetchReadOnlyMining(
-        `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+        `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
         operationList.slice(startingIndex, finalIndex)
         /// to check if can put conditional here and get rid of the second function
       );
     else if (operation == 'Harvest')
       rewardsDataLocal = await fetchReadOnlyHarvesting(
-        `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+        `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
         operationList.slice(startingIndex, finalIndex)
       );
     startingIndex += total;
@@ -214,7 +216,7 @@ export const fetchTokenNameData = async (operation) => {
 
   while (startingIndex < operationList.length) {
     tokenNameDataLocal = await fetchReadOnlySimple(
-      `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+      `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
       operationList.slice(startingIndex, finalIndex)
     );
     startingIndex += total;
@@ -254,8 +256,11 @@ export const fetchEnemyData = async (operation) => {
   let operationList = dataFunctionNames[operation].list;
 
   while (startingIndex < operationList.length) {
+    console.log(
+      `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`
+    );
     enemyDataLocal = await fetchReadOnlySimple(
-      `http://localhost:3999/v2/contracts/call-read/${contractAddress}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
+      `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
       operationList.slice(startingIndex, finalIndex)
     );
     startingIndex += total;

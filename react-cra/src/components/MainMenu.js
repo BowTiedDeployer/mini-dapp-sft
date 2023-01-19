@@ -45,7 +45,6 @@ export const MainMenu = () => {
   const [hasRespondedData, setHasRespondedData] = useState(false);
   const [closedStarterKitPopup, setClosedStarterKitPopup] = useState(false);
   const { doContractCall } = useConnect();
-
   const checkBalanceSelectedItems = (dataDictionary) => {
     let sword = localStorage.getItem('selectedSword');
     let armor = localStorage.getItem('selectedArmor');
@@ -54,7 +53,6 @@ export const MainMenu = () => {
     let shoes = localStorage.getItem('selectedShoes');
     if (sword && sword != '') {
       if (dataDictionary['balances']) {
-        // if (dataDictionary)
         if (dataDictionary['balances'][sword] == '0') {
           localStorage.setItem('selectedSword', '');
           setSelectedSword('');
@@ -94,6 +92,8 @@ export const MainMenu = () => {
       }
     } else localStorage.setItem('selectedShoes', '');
   };
+  if (hasRespondedData) checkBalanceSelectedItems(mainDataDictionary);
+
   const miningFunction = (time) => {
     setSelectedMiningTime(time);
     setOperation('Mine');
@@ -576,7 +576,19 @@ export const MainMenu = () => {
                     Upcoming Fight: Fight {mainDataDictionary['fighting-status']['next-fight']}/10
                     <br />
                     <br />
-                    <button onClick={fightFunction}>Fight</button>
+                    <button
+                      onClick={fightFunction}
+                      disabled={
+                        // checkBalanceSelectedItems(mainDataDictionary) &&
+                        selectedSword == '' ||
+                        selectedArmor == '' ||
+                        selectedHelmet == '' ||
+                        selectedShield == '' ||
+                        selectedShoes == ''
+                      }
+                    >
+                      Fight
+                    </button>
                   </span>
                 </div>
               </span>
