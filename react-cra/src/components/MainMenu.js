@@ -27,6 +27,7 @@ export const activeNetwork =
   network === 'mainnet' ? new StacksMainnet() : network === 'testnet' ? new StacksTestnet() : new StacksMocknet();
 
 export const MainMenu = () => {
+  const [loadingPercent, setLoadingPercent] = useState(0);
   console.log(userAddress);
   const [operation, setOperation] = useState('');
   const [menuPage, setMenuPage] = useState('MainMenu');
@@ -162,38 +163,47 @@ export const MainMenu = () => {
       };
     });
     mainDataDictionaryLocal['EnemyData'] = await fetchEnemyData('enemyData');
+    setLoadingPercent(8);
     mainDataDictionaryLocal['fighting-status'] = await fetchStatusData('fightStatus', userAddress);
-
+    setLoadingPercent(13);
     mainDataDictionaryLocal['starter-kit-status'] = await fetchStatusData('starterKitStatus', userAddress);
-
+    setLoadingPercent(20);
     await new Promise((r) => setTimeout(r, 1000));
 
     mainDataDictionaryLocal['fighting-resources'] = await fetchMainOperationData('fighting-resources');
+    setLoadingPercent(26);
 
     mainDataDictionaryLocal['fighting-rewards'] = await fetchMainOperationData('fighting-rewards');
     await new Promise((r) => setTimeout(r, 1000));
-
+    setLoadingPercent(37);
     mainDataDictionaryLocal['LevelUp'] = await fetchMainOperationData('LevelUp');
-    console.log(mainDataDictionaryLocal);
-
+    setLoadingPercent(49);
     mainDataDictionaryLocal['Craft'] = await fetchMainOperationData('Craft');
+    setLoadingPercent(58);
 
     await new Promise((r) => setTimeout(r, 1000));
 
     mainDataDictionaryLocal['Shop'] = await fetchMainOperationData('Shop');
+    setLoadingPercent(63);
 
     mainDataDictionaryLocal['Sleep'] = await fetchMainOperationData('Sleep');
+    setLoadingPercent(71);
 
     mainDataDictionaryLocal['Mine'] = await fetchTupleOperationData('Mine');
+    setLoadingPercent(79);
 
     mainDataDictionaryLocal['Harvest'] = await fetchTupleOperationData('Harvest');
     await new Promise((r) => setTimeout(r, 1000));
+    setLoadingPercent(88);
 
     mainDataDictionaryLocal['token-name'] = await fetchTokenNameData('tokenName');
+    setLoadingPercent(93);
 
     await new Promise((r) => setTimeout(r, 1000));
 
     mainDataDictionaryLocal['balances'] = await fetchBalancesData('balances', userAddress);
+    setLoadingPercent(100);
+
     console.log(mainDataDictionaryLocal);
     if (mainDataDictionaryLocal) {
       setMainDataDictionary(mainDataDictionaryLocal);
@@ -210,7 +220,7 @@ export const MainMenu = () => {
   const menuPageMapping = {
     MainMenu: (
       <div className="fullscreen-div">
-        {!hasRespondedData && <div>Loading...</div>}
+        {!hasRespondedData && <div>Loading...{loadingPercent}%</div>}
         {hasRespondedData &&
           mainDataDictionary['starter-kit-status']['claimed-starter-kit'] == false &&
           closedStarterKitPopup == false && (
