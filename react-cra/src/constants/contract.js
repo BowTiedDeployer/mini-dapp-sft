@@ -1,6 +1,6 @@
 export const contractAddress = {
   mainnet: '',
-  testnet: 'ST2YSDN555HHC43STFWQ3AAZV4JKNDVMSS8Y90E0E',
+  testnet: 'ST3F85199GWWAHQMJQDTSM84V7FVJN74B6EGSM0QS',
   mocknet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
 };
 export const contractName = {

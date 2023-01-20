@@ -360,11 +360,7 @@ export const NewScene = (props) => {
                 })}
               <div>
                 <button
-                  // disabled={
-                  //   selectedItem && operation == "Shop"
-                  //     ? !checkBalanceByOperation(selectedItem, "Shop")
-                  //     : true
-                  // }
+                  disabled={selectedItem && operation == 'Shop' ? !checkBalanceByOperation(selectedItem, 'Shop') : true}
                   onClick={() => contractCallAction(selectedItem)}
                 >
                   Buy item
@@ -475,7 +471,14 @@ export const NewScene = (props) => {
                     );
                 })}
               <div>
-                <button onClick={() => contractCallAction(selectedItem)}>Craft item</button>
+                <button
+                  disabled={
+                    selectedItem && operation == 'Craft' ? !checkBalanceByOperation(selectedItem, 'Craft') : true
+                  }
+                  onClick={() => contractCallAction(selectedItem)}
+                >
+                  Craft item
+                </button>
               </div>
             </div>
           )}
@@ -583,10 +586,9 @@ export const NewScene = (props) => {
                 })}
               <div>
                 <button
-                  // disabled={
-                  //   selectedItem && operation == 'LevelUp' ? !checkBalanceByOperation(selectedItem, 'LevelUp') : true
-                  // }
-
+                  disabled={
+                    selectedItem && operation == 'LevelUp' ? !checkBalanceByOperation(selectedItem, 'LevelUp') : true
+                  }
                   onClick={() => contractCallAction(selectedItem)}
                 >
                   Level up item
@@ -777,7 +779,7 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}
-                {!selectedHelmet && <div>No helmet</div>}
+                {!selectedHelmet && <div>Helmet</div>}
               </div>
               <div className="grid-item"></div>
               <div className="grid-item">
@@ -807,7 +809,7 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}
-                {!selectedHelmet && <div>No shield</div>}
+                {!selectedHelmet && <div>Shield</div>}
               </div>
               <div className="grid-item">
                 {selectedArmor && (
@@ -836,7 +838,7 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}
-                {!selectedHelmet && <div>No armor</div>}
+                {!selectedHelmet && <div>Armor</div>}
               </div>
               <div className="grid-item">
                 {selectedSword && (
@@ -865,7 +867,9 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}
+                {!selectedSword && <div>Sword</div>}
               </div>
+
               <div className="grid-item"> </div>
               <div className="grid-item">
                 {selectedShoes && (
@@ -893,7 +897,8 @@ export const NewScene = (props) => {
                       </div>
                     </span>
                   </div>
-                )}
+                )}{' '}
+                {!selectedShoes && <div>Shoes</div>}
               </div>
               <div className="grid-item"> </div>
             </div>

@@ -137,7 +137,7 @@ export const MainMenu = () => {
     doContractCall({
       network: activeNetwork,
       anchorMode: AnchorMode.Any,
-      contractAddress: contractAddress,
+      contractAddress: contractAddress[network],
       contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: [],
@@ -166,13 +166,19 @@ export const MainMenu = () => {
 
     mainDataDictionaryLocal['starter-kit-status'] = await fetchStatusData('starterKitStatus', userAddress);
 
+    await new Promise((r) => setTimeout(r, 1000));
+
     mainDataDictionaryLocal['fighting-resources'] = await fetchMainOperationData('fighting-resources');
 
     mainDataDictionaryLocal['fighting-rewards'] = await fetchMainOperationData('fighting-rewards');
+    await new Promise((r) => setTimeout(r, 1000));
 
     mainDataDictionaryLocal['LevelUp'] = await fetchMainOperationData('LevelUp');
+    console.log(mainDataDictionaryLocal);
 
     mainDataDictionaryLocal['Craft'] = await fetchMainOperationData('Craft');
+
+    await new Promise((r) => setTimeout(r, 1000));
 
     mainDataDictionaryLocal['Shop'] = await fetchMainOperationData('Shop');
 
@@ -181,8 +187,11 @@ export const MainMenu = () => {
     mainDataDictionaryLocal['Mine'] = await fetchTupleOperationData('Mine');
 
     mainDataDictionaryLocal['Harvest'] = await fetchTupleOperationData('Harvest');
+    await new Promise((r) => setTimeout(r, 1000));
 
     mainDataDictionaryLocal['token-name'] = await fetchTokenNameData('tokenName');
+
+    await new Promise((r) => setTimeout(r, 1000));
 
     mainDataDictionaryLocal['balances'] = await fetchBalancesData('balances', userAddress);
     console.log(mainDataDictionaryLocal);

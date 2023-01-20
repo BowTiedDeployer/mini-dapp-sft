@@ -63,6 +63,8 @@ export const fetchBalancesData = async (operation, userAddress) => {
   let operationList = dataFunctionNames[operation].list;
 
   while (startingIndex < operationList.length) {
+    await new Promise((r) => setTimeout(r, 200));
+
     mainOperationsDataLocal = await fetchReadOnlyBalances(
       `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
       operationList.slice(startingIndex, finalIndex),
@@ -215,6 +217,8 @@ export const fetchTokenNameData = async (operation) => {
   let operationList = dataFunctionNames[operation].list;
 
   while (startingIndex < operationList.length) {
+    await new Promise((r) => setTimeout(r, 150));
+
     tokenNameDataLocal = await fetchReadOnlySimple(
       `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
       operationList.slice(startingIndex, finalIndex)
