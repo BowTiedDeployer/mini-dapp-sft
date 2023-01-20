@@ -184,6 +184,50 @@ app.post('/rewarding-sleeping', async (req, res) => {
   }
 });
 
+app.post('/rewarding-fighting', async (req, res) => {
+  try {
+    const token_id = req.body.token_id;
+    // const mininng_time = req.body.time;
+    const address = req.body.address;
+
+    // check type correct, if not throw status error
+    if (Number.isInteger(token_id) == false) res.sendStatus(400);
+
+    //get nonce
+    const latestNonce = await getAccountNonce(adminAddress[network]);
+    console.log(token_id, address);
+    //functionArgs
+    let args = [uintCV(token_id), standardPrincipalCV(address)];
+
+    // postConditions
+    // based on what it should get on that specific call
+    // the reward here is more dinamic than on the sleeping because it also depends on the pickaxe_id
+    console.log(args);
+    // txoptions
+    let txOptions = {
+      contractAddress: contractAddress[network],
+      contractName: 'main-sc',
+      functionName: 'reward-fighting',
+      functionArgs: args,
+      senderKey: privateKey[network],
+      network: networkInstance,
+      // postConditions,
+      postConditionMode: PostConditionMode.Allow, // TODO: set Deny
+      fee: 10000n, // 0.01 STX
+      nonce: latestNonce,
+    };
+    let transaction = await makeContractCall(txOptions);
+
+    // broadcast
+    const tx = await broadcastTransaction(transaction, networkInstance);
+    console.log('fighting-reward broadcasted tx: ', tx);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log('fighting-reward error: ', error);
+    res.sendStatus(400);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });

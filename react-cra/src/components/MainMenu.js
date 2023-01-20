@@ -118,7 +118,7 @@ export const MainMenu = () => {
     setMenuPage('NewScene');
   };
   const exploreFunction = () => {
-    setOperation('Exploring');
+    setOperation('Explore');
     setMenuPage('PopupScene');
   };
   const harvestFunction = (time) => {
@@ -127,25 +127,28 @@ export const MainMenu = () => {
     setMenuPage('PopupScene');
   };
   const fightFunction = () => {
+    contractCallAction('Fight', parseInt(mainDataDictionary['fighting-status']['next-fight']));
     setOperation('Fight');
-    setMenuPage('NewScene');
   };
   const functionCloseStarterKit = () => {
     setClosedStarterKitPopup(true);
   };
 
-  const contractCallAction = (operation) => {
+  const contractCallAction = (operation, id) => {
+    let args = [];
+    if (id) args.push(uintCV(id));
     doContractCall({
       network: activeNetwork,
       anchorMode: AnchorMode.Any,
       contractAddress: contractAddress[network],
       contractName: contractName.main,
       functionName: functionName[operation],
-      functionArgs: [],
+      functionArgs: args,
       postConditionMode: PostConditionMode.Allow,
       onFinish: (data) => {
         console.log(`Finished ${operation}`, data);
         console.log(`Check transaction with txId: ${data.txId}`);
+        if (operation == 'Fight') setMenuPage('NewScene');
       },
       onCancel: () => {
         console.log(`Canceled: ${operation}`);

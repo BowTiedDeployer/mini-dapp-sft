@@ -10,6 +10,7 @@ import { network } from '../constants/network';
 import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
 import { contractAddress, contractName, functionName } from '../constants/contract';
 import { activeNetwork } from './MainMenu';
+import { attackScale, fightMechanics } from '../fight/fightEngine';
 
 export const NewScene = (props) => {
   // make a fn to get an id as an arg and return whether true or false (if sufficient balance)
@@ -34,7 +35,6 @@ export const NewScene = (props) => {
   const [selectedType, setSelectedType] = useState('sword');
   const [selectedItem, setSelectedItem] = useState(0);
   const craftLikeOperationList = ['Craft', 'LevelUp', 'Shop'];
-  const attackScale = 8;
 
   const checkBalanceByOperation = (itemId, operation) => {
     let value = true;
@@ -63,128 +63,17 @@ export const NewScene = (props) => {
     damage: parseInt(mainDataDictionary['EnemyData'][nextFight.toString()]['damage']),
     defense: parseInt(mainDataDictionary['EnemyData'][nextFight.toString()]['defense']),
   };
-  function getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-  const fightMechanics = (userStats, enemyStats) => {
-    let randomRatio = 0.2;
-    let i = 1;
-    let userHealth = userStats.health;
-    let userAttack = userStats.damage * attackScale;
-    let userDefense = userStats.defense;
-    let enemyHealth = enemyStats.health;
-    let enemyAttack = enemyStats.damage * attackScale;
-    let enemyDefense = enemyStats.defense;
-    let firstAttack = 0;
-    let firstDefense = 0;
-    let secondAttack = 0;
-    let secondDefense = 0;
-    let firstAttacker = '';
-    let secondAttacker = '';
-    let firstAttackerHP = 0;
-    let secondAttackerHP = 0;
-    let firstHealthAffected = '';
-    let secondHealthAffected = '';
-    let randomStart = getRndInteger(0, 1);
-    if (randomStart == 0) {
-      firstAttack = enemyAttack;
-      firstDefense = userDefense;
-      secondAttack = userAttack;
-      secondDefense = enemyDefense;
-      firstAttacker = 'Enemy';
-      secondAttacker = 'User';
-      firstAttackerHP = enemyHealth;
-      secondAttackerHP = userHealth;
-      firstHealthAffected = 'userHealth';
-      secondHealthAffected = 'enemyHealth';
-    } else {
-      firstAttack = userAttack;
-      firstDefense = enemyDefense;
-      secondAttack = enemyAttack;
-      secondDefense = userDefense;
-      firstAttacker = 'User';
-      secondAttacker = 'Enemy';
-      firstAttackerHP = userHealth;
-      secondAttackerHP = enemyHealth;
-      firstHealthAffected = 'enemyHealth';
-      secondHealthAffected = 'userHealth';
-    }
-    let firstMaxHealth = firstAttackerHP;
-    let secondMaxHealth = secondAttackerHP;
-    // while (userHealth > 0 && enemyHealth > 0) {
-    let attack = setInterval(function () {
-      let rndFirstAttack = getRndInteger(
-        Math.floor(enemyAttack * (1 - randomRatio)),
-        Math.ceil(enemyAttack * (1 + randomRatio))
-      );
-      let rndSecondAttack = getRndInteger(
-        Math.floor(secondAttack * (1 - randomRatio)),
-        Math.ceil(secondAttack * (1 + randomRatio))
-      );
-      let rndFirstDefense = getRndInteger(
-        Math.floor(firstDefense * (1 - randomRatio)),
-        Math.ceil(firstDefense * (1 + randomRatio))
-      );
-      let rndSecondDefense = getRndInteger(
-        Math.floor(secondDefense * (1 - randomRatio)),
-        Math.ceil(secondDefense * (1 + randomRatio))
-      );
 
-      if (i % 2 == 0) {
-        console.log(firstAttack, firstDefense);
-        let attResult = rndSecondAttack - rndSecondDefense >= 0 ? rndSecondAttack - rndSecondDefense : 0;
-        let healthBefore = firstAttackerHP;
-
-        firstAttackerHP -= attResult;
-
-        if (firstAttackerHP < 0) firstAttackerHP = 0;
-        let attackNo = Math.floor((i + 1) / 2);
-        let attackInfoDiv = document.createElement('div');
-        // attackInfoDiv.setAttribute('class', 'right-div');
-        attackInfoDiv.setAttribute('id', 'attackInfoEnemy');
-        attackInfoDiv.innerHTML = `${secondAttacker} attack ${attackNo} deals ${attResult} damage
-        <br> 
-        `;
-        let healthDiv = document.getElementById(secondHealthAffected);
-        if (healthDiv != null) healthDiv.innerHTML = `Health:<br>${firstAttackerHP}/${firstMaxHealth}`;
-        // let previousAttackInfo = document.getElementById('attackInfoEnemy');
-        // if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
-        document.getElementById('fightArena')?.appendChild(attackInfoDiv);
-      } else {
-        let attResult = rndFirstAttack - rndFirstDefense >= 0 ? rndFirstAttack - rndFirstDefense : 0;
-        let healthBefore = secondAttackerHP;
-        secondAttackerHP -= attResult;
-        if (secondAttackerHP < 0) secondAttackerHP = 0;
-        let attackNo = (i + 1) / 2;
-        let attackInfoDiv = document.createElement('div');
-        // attackInfoDiv.setAttribute('class', 'left-div');
-        attackInfoDiv.setAttribute('id', 'attackInfoUser');
-        attackInfoDiv.innerHTML = `${firstAttacker} attack ${attackNo} deals ${attResult} Damage. 
-        <br> `;
-
-        let healthDiv = document.getElementById(firstHealthAffected);
-        if (healthDiv != null) healthDiv.innerHTML = `Health:<br>${secondAttackerHP}/${secondMaxHealth}`;
-
-        // let previousAttackInfo = document.getElementById('attackInfoUser');
-        // if (previousAttackInfo) document.getElementById('fightArena')?.removeChild(previousAttackInfo);
-        document.getElementById('fightArena')?.appendChild(attackInfoDiv);
-      }
-      i++;
-      if (firstAttackerHP <= 0 || secondAttackerHP <= 0) clearInterval(attack);
-    }, 2000);
-    // }
-  };
   const contractCallAction = (id) => {
     doContractCall({
       network: activeNetwork,
       anchorMode: AnchorMode.Any,
-      contractAddress: contractAddress,
+      contractAddress: contractAddress[network],
       contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: [uintCV(id)],
       postConditionMode: PostConditionMode.Allow,
       onFinish: (data) => {
-        // call newScene -> fight, start fight
         console.log(`Finished ${operation}`, data);
         console.log(`Check transaction with txId: ${data.txId}`);
       },
@@ -674,7 +563,7 @@ export const NewScene = (props) => {
         </div>
         <br></br>
         {/* <button onClick={() => contractCallAction(nextFight)}>Start fight {nextFight}</button> */}
-        <button onClick={() => fightMechanics(userStats, enemyStats)}>Start fight {nextFight}</button>
+        <button onClick={() => fightMechanics(userStats, enemyStats, nextFight)}>Start fight {nextFight}</button>
         <button onClick={onClickBack} className="close-btn">
           Back to map
         </button>

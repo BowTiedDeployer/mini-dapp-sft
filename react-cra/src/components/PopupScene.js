@@ -1,6 +1,8 @@
 import React from 'react';
 import { userAddress, userSession } from './ConnectWallet';
 import { network, serverUrl } from '../constants/network';
+import { getRndInteger } from '../utils/randomFn';
+import { exploreWoodsResults } from '../constants/exploreWoods';
 
 // Title
 // Text message
@@ -50,6 +52,23 @@ export const PopupScene = (props) => {
   };
 
   let intervals = [];
+
+  const startExploring = () => {
+    let randomYesNo = getRndInteger(0, 1);
+    let randomSituation = 0;
+    if (randomYesNo == 1) {
+      randomSituation = getRndInteger(0, 9);
+      let resultDiv = document.createElement('div');
+      resultDiv.innerHTML = `${exploreWoodsResults[randomSituation]['string']}`;
+      let claimBtn = document.createElement('button');
+      claimBtn.innerHTML = `Claim rewards`;
+      claimBtn.onclick = () => {
+        //call server
+      };
+      document.getElementById('exploreDiv')?.append(resultDiv);
+      document.getElementById('exploreDiv')?.append(claimBtn);
+    }
+  };
 
   const timer = (operation) => {
     let operationSelectedTime = 0;
@@ -173,13 +192,22 @@ export const PopupScene = (props) => {
         {operation} <br></br>
         Sleep for {selectedSleepingTime} minutes!
         <br></br>
-        {/* TODO: move to claim button */}
         <button id="startSleep" onClick={() => timer(operation)}>
           Start sleeping
         </button>
         <br></br>
         <br></br>
         <div id="timerSleep"></div>
+      </div>
+    ),
+    Explore: (
+      <div id="exploreDiv">
+        {operation} <br></br>
+        <button id="startExploring" onClick={() => startExploring()}>
+          Start exploring
+        </button>
+        <br></br>
+        <br></br>
       </div>
     ),
   };
