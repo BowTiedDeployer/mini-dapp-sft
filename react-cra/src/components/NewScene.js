@@ -24,12 +24,14 @@ export const NewScene = (props) => {
     selectedHelmet,
     selectedShoes,
     nextFight,
+    lastFightWon,
     setSelectedSword,
     setSelectedArmor,
     setSelectedShield,
     setSelectedHelmet,
     setSelectedShoes,
     setMenuPage,
+    setLastFightWon,
   } = props;
   const { doContractCall } = useConnect();
   const [selectedType, setSelectedType] = useState('sword');
@@ -47,7 +49,6 @@ export const NewScene = (props) => {
     });
     return value;
   };
-  console.log('mainDataDictionary NewScene', mainDataDictionary, selectedSword);
   const userStats = {
     health:
       100 +
@@ -361,10 +362,14 @@ export const NewScene = (props) => {
                 })}
               <div>
                 <button
+                  id="btnCraftItem"
                   disabled={
                     selectedItem && operation == 'Craft' ? !checkBalanceByOperation(selectedItem, 'Craft') : true
                   }
-                  onClick={() => contractCallAction(selectedItem)}
+                  onClick={() => {
+                    document.getElementById('btnCraftItem')?.setAttribute('disabled', 'disabled');
+                    contractCallAction(selectedItem);
+                  }}
                 >
                   Craft item
                 </button>
@@ -503,8 +508,7 @@ export const NewScene = (props) => {
           Defense:
           {userStats.defense}
           <br></br>
-          <div id="userHealth">Health:</div>
-          {userStats.health}
+          <div id="userHealth">Health:{userStats.health}</div>
           <br></br>
           <br></br>
           <div className="grid-holder">
@@ -558,12 +562,13 @@ export const NewScene = (props) => {
           Defense:
           {enemyStats.defense}
           <br></br>
-          <div id="enemyHealth">Health:</div>
-          {enemyStats.health}
+          <div id="enemyHealth">Health:{enemyStats.health}</div>
         </div>
         <br></br>
         {/* <button onClick={() => contractCallAction(nextFight)}>Start fight {nextFight}</button> */}
-        <button onClick={() => fightMechanics(userStats, enemyStats, nextFight)}>Start fight {nextFight}</button>
+        <button id="btnStartFight" onClick={() => fightMechanics(userStats, enemyStats, nextFight)}>
+          Start fight {nextFight}
+        </button>
         <button onClick={onClickBack} className="close-btn">
           Back to map
         </button>

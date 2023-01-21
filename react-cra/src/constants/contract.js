@@ -15,4 +15,5 @@ export const functionName = {
   Shop: 'buy-item',
   ClaimStarterKit: 'claim-starter-kit',
   Fight: 'start-fight',
+  Explore: 'burn-wrapper',
 };

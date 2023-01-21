@@ -58,7 +58,6 @@ export const fetchReadOnlyStatus = async (requestUrl, userAddress) => {
       arguments: [cvToHex(principalCV(userAddress))],
     }),
   };
-
   let returnedData = await fetch(requestUrl, requestOptions)
     .then((response) => response.json())
     .then((data) => cvToJSON(hexToCV(data.result)));

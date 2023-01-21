@@ -7,9 +7,9 @@ const appConfig = new AppConfig(['store_write', 'publish_data']);
 
 export const userSession = new UserSession({ appConfig });
 export const userAddress = userSession.isUserSignedIn()
-  ? network == 'mainnet'
+  ? network === 'mainnet'
     ? userSession.loadUserData().profile.stxAddress['mainnet']
-    : network == 'testnet' || network == 'mocknet'
+    : network === 'testnet' || network == 'mocknet'
     ? userSession.loadUserData().profile.stxAddress['testnet']
     : ''
   : '';
@@ -30,8 +30,6 @@ function authenticate() {
 
 const ConnectWallet = () => {
   if (userSession.isUserSignedIn()) {
-    console.log(userSession.loadUserData().profile.stxAddress['mocknet']);
-    console.log(userSession.loadUserData().profile.stxAddress.testnet);
     return <MainMenu />;
   }
 

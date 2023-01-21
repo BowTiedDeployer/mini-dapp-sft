@@ -100,18 +100,12 @@ export const fetchStatusData = async (operation, userAddress) => {
   /// e.g. operation = fighting-resources
   let operationDictionaryLocal = {};
   let mainOperationsDataLocal = '';
-  let startingIndex = 0;
-  let total = 3;
-  let finalIndex = total;
-  let operationList = dataFunctionNames[operation].list;
-
   mainOperationsDataLocal = await fetchReadOnlyStatus(
     `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
     userAddress
   );
   if (mainOperationsDataLocal != '') {
     // for every returned value, keep number of resources sets (resource-id, resource-qty)
-
     if (operation == 'fightStatus') {
       if (mainOperationsDataLocal.value.value == null)
         operationDictionaryLocal = {
@@ -119,7 +113,7 @@ export const fetchStatusData = async (operation, userAddress) => {
         };
       else
         operationDictionaryLocal = {
-          'next-fight': mainOperationsDataLocal.value.value,
+          'next-fight': mainOperationsDataLocal.value.value.value[dataFunctionNames['fightStatus']['value']].value,
         };
     } else if (operation == 'starterKitStatus') {
       if (mainOperationsDataLocal.value.value == null)
@@ -260,9 +254,6 @@ export const fetchEnemyData = async (operation) => {
   let operationList = dataFunctionNames[operation].list;
 
   while (startingIndex < operationList.length) {
-    console.log(
-      `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`
-    );
     enemyDataLocal = await fetchReadOnlySimple(
       `${readOnlyBase[network]}/${contractAddress[network]}/${contractName.main}/${dataFunctionNames[operation].functionName}`,
       operationList.slice(startingIndex, finalIndex)

@@ -3,6 +3,12 @@ import { userAddress, userSession } from './ConnectWallet';
 import { network, serverUrl } from '../constants/network';
 import { getRndInteger } from '../utils/randomFn';
 import { exploreWoodsResults } from '../constants/exploreWoods';
+import { postCallExploringRewards } from '../utils/serverPostCalls';
+// import { contractCallAction } from '../utils/contractCall';
+import { AnchorMode, PostConditionMode, cvToHex, listCV, tupleCV, uintCV } from '@stacks/transactions';
+import { useConnect } from '@stacks/connect-react';
+import { activeNetwork } from './MainMenu';
+import { contractAddress, contractName, functionName } from '../constants/contract';
 
 // Title
 // Text message
@@ -11,6 +17,7 @@ import { exploreWoodsResults } from '../constants/exploreWoods';
 // main start button
 // after clicking start button -> time remaining
 // when time remaining == 0 -> claim rewards calling backend (POST call: function name, time)
+
 const postCall = async (requestUrl, address, time, token_id) => {
   const requestOptions = {
     method: 'POST',
@@ -39,6 +46,38 @@ export const PopupScene = (props) => {
     selectedMiningItem,
   } = props;
 
+  const { doContractCall } = useConnect();
+
+  const contractCallAction = (operation, resource_id, resource_qty) => {
+    let dict;
+    let args = [];
+    if (resource_id && resource_qty) {
+      dict = {
+        'resource-id': uintCV(resource_id),
+        'resource-qty': uintCV(resource_qty),
+      };
+      dict = tupleCV(dict);
+      args.push(dict);
+    }
+    doContractCall({
+      network: activeNetwork,
+      anchorMode: AnchorMode.Any,
+      contractAddress: contractAddress[network],
+      contractName: contractName.main,
+      functionName: functionName[operation],
+      functionArgs: [dict],
+      postConditionMode: PostConditionMode.Allow,
+      onFinish: (data) => {
+        console.log(`Finished ${operation}`, data);
+        console.log(`Check transaction with txId: ${data.txId}`);
+        if (operation == 'Explore') startExploring();
+      },
+      onCancel: () => {
+        console.log(`Canceled: ${operation}`);
+      },
+    });
+  };
+
   const onClickBack = () => {
     intervals.map((interval) => {
       clearInterval(interval);
@@ -52,21 +91,35 @@ export const PopupScene = (props) => {
   };
 
   let intervals = [];
-
+  const initiateExploring = (resource_id, resource_qty) => {
+    contractCallAction(operation, resource_id, resource_qty);
+  };
   const startExploring = () => {
+    document.getElementById('startExploring')?.setAttribute('disabled', 'disabled');
     let randomYesNo = getRndInteger(0, 1);
     let randomSituation = 0;
     if (randomYesNo == 1) {
       randomSituation = getRndInteger(0, 9);
+
       let resultDiv = document.createElement('div');
       resultDiv.innerHTML = `${exploreWoodsResults[randomSituation]['string']}`;
       let claimBtn = document.createElement('button');
       claimBtn.innerHTML = `Claim rewards`;
       claimBtn.onclick = () => {
-        //call server
+        claimBtn.setAttribute('disabled', 'disabled');
+        postCallExploringRewards(
+          `${serverUrl[network]}/rewarding-exploring`,
+          userAddress,
+          parseInt(exploreWoodsResults[randomSituation]['resourceId']),
+          parseInt(exploreWoodsResults[randomSituation]['resourceQty'])
+        );
       };
       document.getElementById('exploreDiv')?.append(resultDiv);
       document.getElementById('exploreDiv')?.append(claimBtn);
+    } else {
+      let resultDiv = document.createElement('div');
+      resultDiv.innerHTML = `The woods were quiet today. Nothing happened!`;
+      document.getElementById('exploreDiv')?.append(resultDiv);
     }
   };
 
@@ -94,7 +147,6 @@ export const PopupScene = (props) => {
     // setting an interval
 
     let x = setInterval(function () {
-      console.log('interval');
       let now = new Date().getTime();
       let distance = endTime - now;
       let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -114,8 +166,10 @@ export const PopupScene = (props) => {
         clearInterval(x);
         if (document.getElementById(`timer${operation}`) != null) {
           let claimBtn = document.createElement('button');
+          claimBtn.setAttribute('id', 'popupClaimButton');
           claimBtn.innerHTML = `Claim rewards!`;
           claimBtn.onclick = () => {
+            document.getElementById('popupClaimButton')?.setAttribute('disabled', 'disabled');
             if (operation == 'Sleep')
               postCall(`${serverUrl[network]}/rewarding-sleeping`, userAddress, selectedSleepingTime);
             else if (operation == 'Mine')
@@ -140,7 +194,6 @@ export const PopupScene = (props) => {
     }, 1000);
 
     intervals.push(x);
-    console.log(intervals);
   };
   const popupSceneMapping = {
     Mine: (
@@ -203,7 +256,7 @@ export const PopupScene = (props) => {
     Explore: (
       <div id="exploreDiv">
         {operation} <br></br>
-        <button id="startExploring" onClick={() => startExploring()}>
+        <button id="startExploring" onClick={() => initiateExploring(2, 15)}>
           Start exploring
         </button>
         <br></br>

@@ -6,6 +6,7 @@ import { postCallFightingRewards } from '../utils/serverPostCalls';
 export const attackScale = 8;
 
 export const fightMechanics = (userStats, enemyStats, nextFight) => {
+  document.getElementById('btnStartFight')?.setAttribute('disabled', 'disabled');
   let randomRatio = 0.2;
   let i = 1;
   let userHealth = userStats.health;
@@ -52,8 +53,8 @@ export const fightMechanics = (userStats, enemyStats, nextFight) => {
   let secondMaxHealth = secondAttackerHP;
   let attack = setInterval(function () {
     let rndFirstAttack = getRndInteger(
-      Math.floor(enemyAttack * (1 - randomRatio)),
-      Math.ceil(enemyAttack * (1 + randomRatio))
+      Math.floor(firstAttack * (1 - randomRatio)),
+      Math.ceil(firstAttack * (1 + randomRatio))
     );
     let rndSecondAttack = getRndInteger(
       Math.floor(secondAttack * (1 - randomRatio)),
@@ -103,16 +104,22 @@ export const fightMechanics = (userStats, enemyStats, nextFight) => {
     i++;
     if (firstAttackerHP <= 0 || secondAttackerHP <= 0) clearInterval(attack);
     if ((firstAttackerHP <= 0 && randomStart == 0) || (secondAttackerHP <= 0 && randomStart == 1)) {
+      localStorage.setItem('lastFightWon', `${nextFight}`);
       let resultDiv = document.createElement('div');
       resultDiv.innerHTML = `Congratulations! You won. Claim your rewards`;
       document.getElementById('fightArena')?.appendChild(resultDiv);
       let claimBtn = document.createElement('button');
+      claimBtn.setAttribute('id', 'btnClaimFight');
       claimBtn.innerHTML = `Claim rewards`;
       claimBtn.onclick = () => {
-        console.log('Claim');
+        document.getElementById('btnClaimFight')?.setAttribute('disabled', 'disabled');
         postCallFightingRewards(`${serverUrl[network]}/rewarding-fighting`, userAddress, parseInt(nextFight));
       };
       document.getElementById('fightArena')?.appendChild(claimBtn);
+    } else if ((firstAttackerHP <= 0 && randomStart == 1) || (secondAttackerHP <= 0 && randomStart == 0)) {
+      let resultDiv = document.createElement('div');
+      resultDiv.innerHTML = `You lost! Improve your items and come back!`;
+      document.getElementById('fightArena')?.appendChild(resultDiv);
     }
   }, 2000);
 };

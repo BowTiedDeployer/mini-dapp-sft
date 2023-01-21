@@ -28,7 +28,6 @@ export const activeNetwork =
 
 export const MainMenu = () => {
   const [loadingPercent, setLoadingPercent] = useState(0);
-  console.log(userAddress);
   const [operation, setOperation] = useState('');
   const [menuPage, setMenuPage] = useState('MainMenu');
   const [mainDataDictionary, setMainDataDictionary] = useState({});
@@ -37,7 +36,6 @@ export const MainMenu = () => {
   const [selectedHelmet, setSelectedHelmet] = useState(localStorage.getItem('selectedHelmet'));
   const [selectedShield, setSelectedShield] = useState(localStorage.getItem('selectedShield'));
   const [selectedShoes, setSelectedShoes] = useState(localStorage.getItem('selectedShoes'));
-  console.log(selectedSword, selectedArmor, selectedHelmet, selectedShield, selectedShoes);
   const [selectedMiningItem, setSelectedMiningItem] = useState('');
   const [selectedHarvestingItem, setSelectedHarvestingItem] = useState('');
   const [selectedSleepingTime, setSelectedSleepingTime] = useState('');
@@ -45,7 +43,31 @@ export const MainMenu = () => {
   const [selectedHarvestingTime, setSelectedHarvestingTime] = useState('');
   const [hasRespondedData, setHasRespondedData] = useState(false);
   const [closedStarterKitPopup, setClosedStarterKitPopup] = useState(false);
+  const [lastFightWon, setLastFightWon] = useState('');
+
   const { doContractCall } = useConnect();
+  const contractCallAction = (operation, id) => {
+    let args = [];
+    if (id) args.push(uintCV(id));
+    doContractCall({
+      network: activeNetwork,
+      anchorMode: AnchorMode.Any,
+      contractAddress: contractAddress[network],
+      contractName: contractName.main,
+      functionName: functionName[operation],
+      functionArgs: args,
+      postConditionMode: PostConditionMode.Allow,
+      onFinish: (data) => {
+        console.log(`Finished ${operation}`, data);
+        console.log(`Check transaction with txId: ${data.txId}`);
+        if (operation == 'Fight') setMenuPage('NewScene');
+      },
+      onCancel: () => {
+        console.log(`Canceled: ${operation}`);
+      },
+    });
+  };
+
   const checkBalanceSelectedItems = (dataDictionary) => {
     let sword = localStorage.getItem('selectedSword');
     let armor = localStorage.getItem('selectedArmor');
@@ -134,29 +156,8 @@ export const MainMenu = () => {
     setClosedStarterKitPopup(true);
   };
 
-  const contractCallAction = (operation, id) => {
-    let args = [];
-    if (id) args.push(uintCV(id));
-    doContractCall({
-      network: activeNetwork,
-      anchorMode: AnchorMode.Any,
-      contractAddress: contractAddress[network],
-      contractName: contractName.main,
-      functionName: functionName[operation],
-      functionArgs: args,
-      postConditionMode: PostConditionMode.Allow,
-      onFinish: (data) => {
-        console.log(`Finished ${operation}`, data);
-        console.log(`Check transaction with txId: ${data.txId}`);
-        if (operation == 'Fight') setMenuPage('NewScene');
-      },
-      onCancel: () => {
-        console.log(`Canceled: ${operation}`);
-      },
-    });
-  };
-
   const fetchMainDictionary = useCallback(async () => {
+    console.log('load once');
     let mainDataDictionaryLocal = {};
 
     itemsList.forEach((item) => {
@@ -207,8 +208,8 @@ export const MainMenu = () => {
     mainDataDictionaryLocal['balances'] = await fetchBalancesData('balances', userAddress);
     setLoadingPercent(100);
 
-    console.log(mainDataDictionaryLocal);
     if (mainDataDictionaryLocal) {
+      console.log(mainDataDictionaryLocal);
       setMainDataDictionary(mainDataDictionaryLocal);
       setHasRespondedData(true);
       checkBalanceSelectedItems(mainDataDictionaryLocal);
@@ -216,8 +217,12 @@ export const MainMenu = () => {
   }, [setMainDataDictionary]);
 
   useEffect(() => {
+    if (localStorage.getItem('lastFightWon') != null) setLastFightWon(localStorage.getItem('lastFightWon'));
+
     fetchMainDictionary();
-    console.log(mainDataDictionary);
+    let fetchingInterval = setInterval(function () {
+      fetchMainDictionary();
+    }, 60000);
   }, [setHasRespondedData]);
 
   const menuPageMapping = {
@@ -584,9 +589,6 @@ export const MainMenu = () => {
                           </div>
                         );
                       })}
-                    {/* <button onClick={lumberjackFunction}>
-                      Start Harvesting
-                    </button> */}
                   </span>
                 </div>
               </span>
@@ -606,7 +608,8 @@ export const MainMenu = () => {
                         selectedArmor == '' ||
                         selectedHelmet == '' ||
                         selectedShield == '' ||
-                        selectedShoes == ''
+                        selectedShoes == '' ||
+                        lastFightWon == mainDataDictionary['fighting-status']['next-fight']
                       }
                     >
                       Fight
@@ -651,12 +654,14 @@ export const MainMenu = () => {
           selectedHelmet={selectedHelmet}
           selectedShoes={selectedShoes}
           nextFight={mainDataDictionary['fighting-status']['next-fight']}
+          lastFightWon={lastFightWon}
           setMenuPage={setMenuPage}
           setSelectedSword={setSelectedSword}
           setSelectedArmor={setSelectedArmor}
           setSelectedShield={setSelectedShield}
           setSelectedHelmet={setSelectedHelmet}
           setSelectedShoes={setSelectedShoes}
+          setLastFightWon={setLastFightWon}
         />
       </div>
     ),
