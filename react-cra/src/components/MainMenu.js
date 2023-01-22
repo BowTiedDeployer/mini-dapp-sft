@@ -20,7 +20,18 @@ import { network } from '../constants/network';
 import { StacksMainnet, StacksMocknet, StacksTestnet } from '@stacks/network';
 import { useConnect } from '@stacks/connect-react';
 import { contractAddress, contractName, functionName } from '../constants/contract';
-import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
+import {
+  AnchorMode,
+  FungibleConditionCode,
+  NonFungibleConditionCode,
+  PostConditionMode,
+  createAssetInfo,
+  makeStandardFungiblePostCondition,
+  makeStandardNonFungiblePostCondition,
+  standardPrincipalCV,
+  tupleCV,
+  uintCV,
+} from '@stacks/transactions';
 import { dataFunctionNames } from '../constants/dataFunctionNames';
 
 export const activeNetwork =
@@ -47,6 +58,56 @@ export const MainMenu = () => {
 
   const { doContractCall } = useConnect();
   const contractCallAction = (operation, id) => {
+    //postConditions
+
+    const getSerialisedNftTuple = function (nftIndex) {
+      const tupCV = tupleCV({
+        'token-id': uintCV(nftIndex),
+        owner: standardPrincipalCV(userAddress),
+      });
+      return tupCV;
+    };
+
+    const getGFTMintPostConds = function (amount, contractName, nftIndex, assetName) {
+      const postConditionAddress = userAddress;
+      const postConditionCode = FungibleConditionCode.Equal;
+      const postConditionAmount = amount;
+      const fungibleAssetInfo = createAssetInfo(contractAddress[network], contractName, 'edition-token');
+
+      const standardFungiblePostCondition = makeStandardFungiblePostCondition(
+        postConditionAddress,
+        postConditionCode,
+        postConditionAmount,
+        fungibleAssetInfo
+      );
+
+      const nonFungibleAssetInfo = createAssetInfo(
+        contractAddress[network],
+        contractName['main'],
+        assetName ? assetName : contractName.split('-')[0]
+      );
+      const standardNonFungiblePostConditionNotOwns = makeStandardNonFungiblePostCondition(
+        userAddress,
+        NonFungibleConditionCode.DoesNotSend,
+        nonFungibleAssetInfo,
+        getSerialisedNftTuple(nftIndex)
+      );
+
+      const postConds = [];
+      if (amount >= mainDataDictionary['balances'][nftIndex]) {
+        postConds.push(standardNonFungiblePostConditionNotOwns);
+        console.log(postConds, 'if');
+      } else {
+        postConds.push(standardNonFungiblePostConditionNotOwns);
+        console.log(postConds, 'else');
+      }
+      postConds.push(standardFungiblePostCondition);
+      return postConds;
+    };
+    let postConditions = [];
+    if (operation == 'Fight') postConditions = getGFTMintPostConds('10', contractName.main, '2', 'energy');
+
+    console.log(postConditions);
     let args = [];
     if (id) args.push(uintCV(id));
     doContractCall({
@@ -56,7 +117,8 @@ export const MainMenu = () => {
       contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: args,
-      postConditionMode: PostConditionMode.Allow,
+      postConditionMode: PostConditionMode.Deny,
+      postConditions: postConditions,
       onFinish: (data) => {
         console.log(`Finished ${operation}`, data);
         console.log(`Check transaction with txId: ${data.txId}`);
