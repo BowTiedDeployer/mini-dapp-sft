@@ -69,28 +69,30 @@ export const NewScene = (props) => {
   const contractCallAction = (id) => {
     let postConditions = [];
     // postConditions= operation=='Craft'?
-    if (operation == 'Craft') {
-      Object.keys(mainDataDictionary['Craft'][id]).forEach((resourcePair) => {
-        console.log('resourcePair', resourcePair);
-        let amount = mainDataDictionary['Craft'][id][resourcePair]['resource-qty'].value;
-        let nftIndex = mainDataDictionary['Craft'][id][resourcePair]['resource-id'].value;
-        let contractNameLocal =
-          parseInt(nftIndex) < 5
-            ? contractName.resources
-            : parseInt(nftIndex) < 50
-            ? contractName.items
-            : nftIndex < 58
-            ? contractName.collection1
-            : '';
-        let balanceNftIndex = parseInt(mainDataDictionary['balances'][nftIndex]);
-        let assetName = 'semi-fungible-token-id';
-        let eventType = 'burn';
-        postConditions = postConditions.concat(
-          getGFTMintPostConds(amount, balanceNftIndex, contractNameLocal, nftIndex, assetName, eventType)
-        );
-      });
-      postConditions =
-        id < 5
+    // if (operation == operation) {
+    Object.keys(mainDataDictionary[operation][id]).forEach((resourcePair) => {
+      console.log('resourcePair', resourcePair);
+      let amount = mainDataDictionary[operation][id][resourcePair]['resource-qty'].value;
+      let nftIndex = mainDataDictionary[operation][id][resourcePair]['resource-id'].value;
+      console.log(nftIndex);
+      let contractNameLocal =
+        parseInt(nftIndex) < 5
+          ? contractName.resources
+          : parseInt(nftIndex) < 50
+          ? contractName.items
+          : parseInt(nftIndex) < 58
+          ? contractName.collection1
+          : '';
+      let balanceNftIndex = parseInt(mainDataDictionary['balances'][nftIndex]);
+      let assetName = 'semi-fungible-token-id';
+      let eventType = 'burn';
+      postConditions = postConditions.concat(
+        getGFTMintPostConds(amount, balanceNftIndex, contractNameLocal, nftIndex, assetName, eventType)
+      );
+    });
+    postConditions =
+      parseInt(mainDataDictionary['balances'][id]) > 0
+        ? id < 5
           ? postConditions.concat(
               getGFTMintPostConds(
                 '1',
@@ -112,7 +114,8 @@ export const NewScene = (props) => {
                 'mint'
               )
             )
-          : postConditions.concat(
+          : id < 58
+          ? postConditions.concat(
               getGFTMintPostConds(
                 '1',
                 mainDataDictionary['balances'][id],
@@ -121,8 +124,9 @@ export const NewScene = (props) => {
                 'semi-fungible-token-id',
                 'mint'
               )
-            );
-    }
+            )
+          : postConditions
+        : postConditions;
 
     // operation == 'Fight'
     //   ? nextFight == 5 || nextFight == 10
@@ -162,7 +166,7 @@ export const NewScene = (props) => {
       contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: [uintCV(id)],
-      postConditionMode: operation == 'Craft' ? PostConditionMode.Deny : PostConditionMode.Allow,
+      postConditionMode: PostConditionMode.Deny,
       postConditions: postConditions,
       onFinish: (data) => {
         console.log(`Finished ${operation}`, data);

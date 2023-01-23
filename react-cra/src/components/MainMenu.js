@@ -580,7 +580,6 @@ export const MainMenu = () => {
                                 selectedHarvestingItem != '' &&
                                 Object.keys(mainDataDictionary['Harvest'][selectedHarvestingItem][time]).map(
                                   (rewardSet) => {
-                                    console.log(rewardSet);
                                     return (
                                       <div className="img-container-new-scene" key={`HarvestReward${rewardSet}`}>
                                         <figure>
