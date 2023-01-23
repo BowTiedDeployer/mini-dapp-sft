@@ -6,7 +6,7 @@ export const contractAddress = {
 export const contractName = {
   main: 'main-sc',
   resources: 'resources',
-  shop: 'items',
+  items: 'items',
   collection1: 'collection-1',
 };
 export const functionName = {

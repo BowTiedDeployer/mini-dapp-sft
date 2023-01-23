@@ -11,6 +11,7 @@ import { AnchorMode, PostConditionMode, uintCV } from '@stacks/transactions';
 import { contractAddress, contractName, functionName } from '../constants/contract';
 import { activeNetwork } from './MainMenu';
 import { attackScale, fightMechanics } from '../fight/fightEngine';
+import { getGFTMintPostConds } from '../utils/makePostConditions';
 
 export const NewScene = (props) => {
   // make a fn to get an id as an arg and return whether true or false (if sufficient balance)
@@ -66,6 +67,94 @@ export const NewScene = (props) => {
   };
 
   const contractCallAction = (id) => {
+    let postConditions = [];
+    // postConditions= operation=='Craft'?
+    if (operation == 'Craft') {
+      Object.keys(mainDataDictionary['Craft'][id]).forEach((resourcePair) => {
+        console.log('resourcePair', resourcePair);
+        let amount = mainDataDictionary['Craft'][id][resourcePair]['resource-qty'].value;
+        let nftIndex = mainDataDictionary['Craft'][id][resourcePair]['resource-id'].value;
+        let contractNameLocal =
+          parseInt(nftIndex) < 5
+            ? contractName.resources
+            : parseInt(nftIndex) < 50
+            ? contractName.items
+            : nftIndex < 58
+            ? contractName.collection1
+            : '';
+        let balanceNftIndex = parseInt(mainDataDictionary['balances'][nftIndex]);
+        let assetName = 'semi-fungible-token-id';
+        let eventType = 'burn';
+        postConditions = postConditions.concat(
+          getGFTMintPostConds(amount, balanceNftIndex, contractNameLocal, nftIndex, assetName, eventType)
+        );
+      });
+      postConditions =
+        id < 5
+          ? postConditions.concat(
+              getGFTMintPostConds(
+                '1',
+                mainDataDictionary['balances'][id],
+                contractName.resources,
+                id,
+                'semi-fungible-token-id',
+                'mint'
+              )
+            )
+          : id < 50
+          ? postConditions.concat(
+              getGFTMintPostConds(
+                '1',
+                mainDataDictionary['balances'][id],
+                contractName.items,
+                id,
+                'semi-fungible-token-id',
+                'mint'
+              )
+            )
+          : postConditions.concat(
+              getGFTMintPostConds(
+                '1',
+                mainDataDictionary['balances'][id],
+                contractName.collection1,
+                id,
+                'semi-fungible-token-id',
+                'mint'
+              )
+            );
+    }
+
+    // operation == 'Fight'
+    //   ? nextFight == 5 || nextFight == 10
+    //     ? getGFTMintPostConds(
+    //         mainDataDictionary['fighting-rewards'][nextFight][1]['resource-qty'].value,
+    //         mainDataDictionary['balances'][mainDataDictionary['fighting-rewards'][nextFight][1]['resource-id'].value],
+    //         contractName.resources,
+    //         mainDataDictionary['fighting-rewards'][nextFight][1]['resource-id'].value,
+    //         'semi-fungible-token-id',
+    //         'mint'
+    //       ).concat(
+    //         getGFTMintPostConds(
+    //           mainDataDictionary['fighting-rewards'][nextFight][2]['resource-qty'].value,
+    //           mainDataDictionary['balances'][
+    //             mainDataDictionary['fighting-rewards'][nextFight][1]['resource-id'].value
+    //           ],
+    //           contractName.items,
+    //           mainDataDictionary['fighting-rewards'][nextFight][2]['resource-id'].value,
+    //           'semi-fungible-token-id',
+    //           'mint'
+    //         )
+    //       )
+    //     : getGFTMintPostConds(
+    //         mainDataDictionary['fighting-rewards'][nextFight][1]['resource-qty'].value,
+    //         mainDataDictionary['balances'][mainDataDictionary['fighting-rewards'][nextFight][1]['resource-id'].value],
+    //         contractName.resources,
+    //         mainDataDictionary['fighting-rewards'][nextFight][1]['resource-id'].value,
+    //         'semi-fungible-token-id',
+    //         'mint'
+    //       )
+    //   : [];
+
     doContractCall({
       network: activeNetwork,
       anchorMode: AnchorMode.Any,
@@ -73,7 +162,8 @@ export const NewScene = (props) => {
       contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: [uintCV(id)],
-      postConditionMode: PostConditionMode.Allow,
+      postConditionMode: operation == 'Craft' ? PostConditionMode.Deny : PostConditionMode.Allow,
+      postConditions: postConditions,
       onFinish: (data) => {
         console.log(`Finished ${operation}`, data);
         console.log(`Check transaction with txId: ${data.txId}`);
