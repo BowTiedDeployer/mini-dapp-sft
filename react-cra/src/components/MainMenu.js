@@ -33,6 +33,7 @@ import {
   uintCV,
 } from '@stacks/transactions';
 import { dataFunctionNames } from '../constants/dataFunctionNames';
+import { getGFTMintPostConds } from '../utils/makePostConditions';
 
 export const activeNetwork =
   network === 'mainnet' ? new StacksMainnet() : network === 'testnet' ? new StacksTestnet() : new StacksMocknet();
@@ -60,54 +61,16 @@ export const MainMenu = () => {
   const contractCallAction = (operation, id) => {
     //postConditions
 
-    const getSerialisedNftTuple = function (nftIndex) {
-      const tupCV = tupleCV({
-        'token-id': uintCV(nftIndex),
-        owner: standardPrincipalCV(userAddress),
-      });
-      return tupCV;
-    };
-
-    const getGFTMintPostConds = function (amount, contractName, nftIndex, assetName, eventType) {
-      const postConditionAddress = userAddress;
-      const postConditionCode = FungibleConditionCode.Equal;
-      const postConditionAmount = amount;
-      const fungibleAssetInfo = createAssetInfo(contractAddress[network], contractName, 'semi-fungible-token');
-
-      const standardFungiblePostCondition = makeStandardFungiblePostCondition(
-        postConditionAddress,
-        postConditionCode,
-        postConditionAmount,
-        fungibleAssetInfo
-      );
-
-      const nonFungibleAssetInfo = createAssetInfo(
-        contractAddress[network],
-        contractName,
-        assetName ? assetName : contractName.split('-')[0]
-      );
-
-      const standardNonFungiblePostConditionNotOwns = makeStandardNonFungiblePostCondition(
-        userAddress,
-        NonFungibleConditionCode.Sends,
-        nonFungibleAssetInfo,
-        getSerialisedNftTuple(nftIndex)
-      );
-
-      const postConds = [];
-      if (amount >= mainDataDictionary['balances'][nftIndex]) {
-        postConds.push(standardNonFungiblePostConditionNotOwns);
-      } else {
-        postConds.push(standardNonFungiblePostConditionNotOwns);
-      }
-      if (eventType == 'burn') postConds.push(standardFungiblePostCondition);
-      return postConds;
-    };
     let postConditions = [];
     if (operation == 'Fight') {
       postConditions = getGFTMintPostConds(
         mainDataDictionary['fighting-resources'][mainDataDictionary['fighting-status']['next-fight']][1]['resource-qty']
           .value,
+        mainDataDictionary['balances'][
+          mainDataDictionary['fighting-resources'][mainDataDictionary['fighting-status']['next-fight']][1][
+            'resource-id'
+          ].value
+        ],
         contractName.resources,
         mainDataDictionary['fighting-resources'][mainDataDictionary['fighting-status']['next-fight']][1]['resource-id']
           .value,
@@ -116,8 +79,22 @@ export const MainMenu = () => {
       );
     } else if (operation == 'ClaimStarterKit') {
       postConditions = [
-        getGFTMintPostConds('15', contractName.resources, '1', 'semi-fungible-token-id', 'mint')[0],
-        getGFTMintPostConds('100', contractName.resources, '2', 'semi-fungible-token-id', 'mint')[0],
+        getGFTMintPostConds(
+          '15',
+          mainDataDictionary['balances'][1],
+          contractName.resources,
+          '1',
+          'semi-fungible-token-id',
+          'mint'
+        )[0],
+        getGFTMintPostConds(
+          '100',
+          mainDataDictionary['balances'][2],
+          contractName.resources,
+          '2',
+          'semi-fungible-token-id',
+          'mint'
+        )[0],
       ];
     }
     console.log(postConditions);
