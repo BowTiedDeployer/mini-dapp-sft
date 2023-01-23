@@ -68,11 +68,11 @@ export const MainMenu = () => {
       return tupCV;
     };
 
-    const getGFTMintPostConds = function (amount, contractName, nftIndex, assetName) {
+    const getGFTMintPostConds = function (amount, contractName, nftIndex, assetName, eventType) {
       const postConditionAddress = userAddress;
       const postConditionCode = FungibleConditionCode.Equal;
       const postConditionAmount = amount;
-      const fungibleAssetInfo = createAssetInfo(contractAddress[network], contractName, 'edition-token');
+      const fungibleAssetInfo = createAssetInfo(contractAddress[network], contractName, 'semi-fungible-token');
 
       const standardFungiblePostCondition = makeStandardFungiblePostCondition(
         postConditionAddress,
@@ -83,12 +83,13 @@ export const MainMenu = () => {
 
       const nonFungibleAssetInfo = createAssetInfo(
         contractAddress[network],
-        contractName['main'],
+        contractName,
         assetName ? assetName : contractName.split('-')[0]
       );
+
       const standardNonFungiblePostConditionNotOwns = makeStandardNonFungiblePostCondition(
         userAddress,
-        NonFungibleConditionCode.DoesNotSend,
+        NonFungibleConditionCode.Sends,
         nonFungibleAssetInfo,
         getSerialisedNftTuple(nftIndex)
       );
@@ -96,17 +97,29 @@ export const MainMenu = () => {
       const postConds = [];
       if (amount >= mainDataDictionary['balances'][nftIndex]) {
         postConds.push(standardNonFungiblePostConditionNotOwns);
-        console.log(postConds, 'if');
       } else {
         postConds.push(standardNonFungiblePostConditionNotOwns);
-        console.log(postConds, 'else');
       }
-      postConds.push(standardFungiblePostCondition);
+      if (eventType == 'burn') postConds.push(standardFungiblePostCondition);
       return postConds;
     };
     let postConditions = [];
-    if (operation == 'Fight') postConditions = getGFTMintPostConds('10', contractName.main, '2', 'energy');
-
+    if (operation == 'Fight') {
+      postConditions = getGFTMintPostConds(
+        mainDataDictionary['fighting-resources'][mainDataDictionary['fighting-status']['next-fight']][1]['resource-qty']
+          .value,
+        contractName.resources,
+        mainDataDictionary['fighting-resources'][mainDataDictionary['fighting-status']['next-fight']][1]['resource-id']
+          .value,
+        'semi-fungible-token-id',
+        'burn'
+      );
+    } else if (operation == 'ClaimStarterKit') {
+      postConditions = [
+        getGFTMintPostConds('15', contractName.resources, '1', 'semi-fungible-token-id', 'mint')[0],
+        getGFTMintPostConds('100', contractName.resources, '2', 'semi-fungible-token-id', 'mint')[0],
+      ];
+    }
     console.log(postConditions);
     let args = [];
     if (id) args.push(uintCV(id));
@@ -117,7 +130,8 @@ export const MainMenu = () => {
       contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: args,
-      postConditionMode: PostConditionMode.Deny,
+      postConditionMode:
+        operation == 'Fight' || operation == 'ClaimStarterKit' ? PostConditionMode.Deny : PostConditionMode.Allow,
       postConditions: postConditions,
       onFinish: (data) => {
         console.log(`Finished ${operation}`, data);
