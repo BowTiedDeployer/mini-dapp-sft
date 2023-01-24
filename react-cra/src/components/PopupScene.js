@@ -9,6 +9,7 @@ import { AnchorMode, PostConditionMode, cvToHex, listCV, tupleCV, uintCV } from 
 import { useConnect } from '@stacks/connect-react';
 import { activeNetwork } from './MainMenu';
 import { contractAddress, contractName, functionName } from '../constants/contract';
+import { getGFTMintPostConds } from '../utils/makePostConditions';
 
 // Title
 // Text message
@@ -51,6 +52,17 @@ export const PopupScene = (props) => {
   const contractCallAction = (operation, resource_id, resource_qty) => {
     let dict;
     let args = [];
+    let postConditions =
+      operation == 'Explore'
+        ? getGFTMintPostConds(
+            '15',
+            mainDataDictionary['balances']['2'],
+            contractName.resources,
+            '2',
+            'semi-fungible-token-id',
+            'burn'
+          )
+        : [];
     if (resource_id && resource_qty) {
       dict = {
         'resource-id': uintCV(resource_id),
@@ -59,6 +71,7 @@ export const PopupScene = (props) => {
       dict = tupleCV(dict);
       args.push(dict);
     }
+
     doContractCall({
       network: activeNetwork,
       anchorMode: AnchorMode.Any,
@@ -66,7 +79,8 @@ export const PopupScene = (props) => {
       contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: [dict],
-      postConditionMode: PostConditionMode.Allow,
+      postConditionMode: operation == 'Explore' ? PostConditionMode.Deny : PostConditionMode.Allow,
+      postConditions: postConditions,
       onFinish: (data) => {
         console.log(`Finished ${operation}`, data);
         console.log(`Check transaction with txId: ${data.txId}`);

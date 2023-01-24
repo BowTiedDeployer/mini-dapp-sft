@@ -5,7 +5,7 @@ import { postCallFightingRewards } from '../utils/serverPostCalls';
 
 export const attackScale = 8;
 
-export const fightMechanics = (userStats, enemyStats, nextFight) => {
+export const fightMechanics = (userStats, enemyStats, nextFight, mainDataDictionary) => {
   document.getElementById('btnStartFight')?.setAttribute('disabled', 'disabled');
   let randomRatio = 0.2;
   let i = 1;
@@ -104,9 +104,18 @@ export const fightMechanics = (userStats, enemyStats, nextFight) => {
     i++;
     if (firstAttackerHP <= 0 || secondAttackerHP <= 0) clearInterval(attack);
     if ((firstAttackerHP <= 0 && randomStart == 0) || (secondAttackerHP <= 0 && randomStart == 1)) {
+      let rewardString = '';
+      Object.keys(mainDataDictionary['fighting-rewards'][nextFight]).forEach((rewardSet) => {
+        rewardString += `${mainDataDictionary['fighting-rewards'][nextFight][rewardSet]['resource-qty'].value} ${
+          mainDataDictionary['token-name'][
+            mainDataDictionary['fighting-rewards'][nextFight][rewardSet]['resource-id'].value
+          ].name
+        }<br>`;
+      });
+      console.log(rewardString);
       localStorage.setItem('lastFightWon', `${nextFight}`);
       let resultDiv = document.createElement('div');
-      resultDiv.innerHTML = `Congratulations! You won. Claim your rewards`;
+      resultDiv.innerHTML = `Congratulations! You won. You will be rewarded:<br>${rewardString}`;
       document.getElementById('fightArena')?.appendChild(resultDiv);
       let claimBtn = document.createElement('button');
       claimBtn.setAttribute('id', 'btnClaimFight');

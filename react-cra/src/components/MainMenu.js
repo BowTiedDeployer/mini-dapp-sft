@@ -657,6 +657,24 @@ export const MainMenu = () => {
                     <h3>Fighting here!</h3>
                     <br />
                     Upcoming Fight: Fight {mainDataDictionary['fighting-status']['next-fight']}/10
+                    <br></br>
+                    If you win, you will be rewarded:
+                    <br></br>
+                    {Object.keys(
+                      mainDataDictionary['fighting-rewards'][mainDataDictionary['fighting-status']['next-fight']]
+                    ).map((rewardSet) => {
+                      return `${
+                        mainDataDictionary['fighting-rewards'][mainDataDictionary['fighting-status']['next-fight']][
+                          rewardSet
+                        ]['resource-qty'].value
+                      } ${
+                        mainDataDictionary['token-name'][
+                          mainDataDictionary['fighting-rewards'][mainDataDictionary['fighting-status']['next-fight']][
+                            rewardSet
+                          ]['resource-id'].value
+                        ].name
+                      } `;
+                    })}
                     <br />
                     <br />
                     <button

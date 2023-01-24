@@ -38,7 +38,12 @@ export const NewScene = (props) => {
   const [selectedType, setSelectedType] = useState('sword');
   const [selectedItem, setSelectedItem] = useState(0);
   const craftLikeOperationList = ['Craft', 'LevelUp'];
-
+  // const startFight = () => {
+  //   let rewardList = [];
+  //   Object.keys(mainDataDictionary['fighting-rewards'][nextFight]).forEach((rewardSet) => {
+  //     rewardList[mainDataDictionary['fighting-rewards'][nextFight][rewardSet]['resource-id']]
+  //   });
+  // };
   const checkBalanceByOperation = (itemId, operation) => {
     let value = true;
     Object.keys(mainDataDictionary[operation][itemId]).forEach((resourceSet) => {
@@ -575,10 +580,14 @@ export const NewScene = (props) => {
                 })}
               <div>
                 <button
+                  id="btnLevelUp"
                   disabled={
                     selectedItem && operation == 'LevelUp' ? !checkBalanceByOperation(selectedItem, 'LevelUp') : true
                   }
-                  onClick={() => contractCallAction(selectedItem)}
+                  onClick={() => {
+                    document.getElementById('btnLevelUp')?.setAttribute('disabled', 'disabled');
+                    contractCallAction(selectedItem);
+                  }}
                 >
                   Level up item
                 </button>
@@ -661,7 +670,7 @@ export const NewScene = (props) => {
         </div>
         <br></br>
         {/* <button onClick={() => contractCallAction(nextFight)}>Start fight {nextFight}</button> */}
-        <button id="btnStartFight" onClick={() => fightMechanics(userStats, enemyStats, nextFight)}>
+        <button id="btnStartFight" onClick={() => fightMechanics(userStats, enemyStats, nextFight, mainDataDictionary)}>
           Start fight {nextFight}
         </button>
         <button onClick={onClickBack} className="close-btn">
