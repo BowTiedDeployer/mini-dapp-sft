@@ -1,4 +1,4 @@
-export const network = 'mocknet';
+export const network = 'testnet';
 export const maxStacksTxFee = 750000;
 
 export const coreApiUrl = {
@@ -9,18 +9,18 @@ export const coreApiUrl = {
 
 export const privateKey = {
   mainnet: '',
-  testnet: '',
+  testnet: 'c7963ed8a7dd6814215125fb7dcb3c9144f0626feb8749fdd003d6ed04c076c801',
   mocknet: '753b7cc01a1a2e86221266a154af739463fce51219d97e4f856cd7200c3bd2a601',
 };
 
 export const adminAddress = {
   mainnet: '',
-  testnet: '',
+  testnet: 'ST3F85199GWWAHQMJQDTSM84V7FVJN74B6EGSM0QS',
   mocknet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
 };
 
 export const contractAddress = {
   mainnet: '',
-  testnet: '',
+  testnet: 'ST3F85199GWWAHQMJQDTSM84V7FVJN74B6EGSM0QS',
   mocknet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
 };

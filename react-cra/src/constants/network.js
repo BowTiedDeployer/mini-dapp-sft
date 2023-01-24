@@ -1,4 +1,4 @@
-export const network = 'mocknet';
+export const network = 'testnet';
 // testnet, mainnet, mocknet
 
 export const serverUrl = {

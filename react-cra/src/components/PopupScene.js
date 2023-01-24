@@ -113,7 +113,7 @@ export const PopupScene = (props) => {
     let randomYesNo = getRndInteger(0, 1);
     let randomSituation = 0;
     if (randomYesNo == 1) {
-      randomSituation = getRndInteger(0, 9);
+      randomSituation = getRndInteger(1, 9);
 
       let resultDiv = document.createElement('div');
       resultDiv.innerHTML = `${exploreWoodsResults[randomSituation]['string']}`;

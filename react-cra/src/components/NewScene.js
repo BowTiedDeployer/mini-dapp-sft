@@ -467,7 +467,6 @@ export const NewScene = (props) => {
                     selectedItem && operation == 'Craft' ? !checkBalanceByOperation(selectedItem, 'Craft') : true
                   }
                   onClick={() => {
-                    document.getElementById('btnCraftItem')?.setAttribute('disabled', 'disabled');
                     contractCallAction(selectedItem);
                   }}
                 >
@@ -585,7 +584,6 @@ export const NewScene = (props) => {
                     selectedItem && operation == 'LevelUp' ? !checkBalanceByOperation(selectedItem, 'LevelUp') : true
                   }
                   onClick={() => {
-                    document.getElementById('btnLevelUp')?.setAttribute('disabled', 'disabled');
                     contractCallAction(selectedItem);
                   }}
                 >
@@ -777,7 +775,7 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}
-                {!selectedHelmet && <div>Helmet</div>}
+                {!selectedHelmet && <div></div>}
               </div>
               <div className="grid-item"></div>
               <div className="grid-item">
@@ -807,7 +805,7 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}
-                {!selectedHelmet && <div>Shield</div>}
+                {!selectedHelmet && <div></div>}
               </div>
               <div className="grid-item">
                 {selectedArmor && (
@@ -836,7 +834,7 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}
-                {!selectedHelmet && <div>Armor</div>}
+                {!selectedHelmet && <div></div>}
               </div>
               <div className="grid-item">
                 {selectedSword && (
@@ -865,7 +863,7 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}
-                {!selectedSword && <div>Sword</div>}
+                {!selectedSword && <div></div>}
               </div>
 
               <div className="grid-item"> </div>
@@ -896,7 +894,7 @@ export const NewScene = (props) => {
                     </span>
                   </div>
                 )}{' '}
-                {!selectedShoes && <div>Shoes</div>}
+                {!selectedShoes && <div></div>}
               </div>
               <div className="grid-item"> </div>
             </div>
