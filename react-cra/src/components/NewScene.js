@@ -166,8 +166,9 @@ export const NewScene = (props) => {
       contractName: contractName.main,
       functionName: functionName[operation],
       functionArgs: [uintCV(id)],
-      postConditionMode: PostConditionMode.Deny,
-      postConditions: postConditions,
+      postConditionMode:
+        Object.keys(mainDataDictionary[operation][id]).length == 1 ? PostConditionMode.Deny : PostConditionMode.Allow,
+      postConditions: Object.keys(mainDataDictionary[operation][id]).length == 1 ? postConditions : [],
       onFinish: (data) => {
         console.log(`Finished ${operation}`, data);
         console.log(`Check transaction with txId: ${data.txId}`);
