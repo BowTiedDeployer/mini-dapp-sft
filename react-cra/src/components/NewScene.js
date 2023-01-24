@@ -37,7 +37,7 @@ export const NewScene = (props) => {
   const { doContractCall } = useConnect();
   const [selectedType, setSelectedType] = useState('sword');
   const [selectedItem, setSelectedItem] = useState(0);
-  const craftLikeOperationList = ['Craft', 'LevelUp', 'Shop'];
+  const craftLikeOperationList = ['Craft', 'LevelUp'];
 
   const checkBalanceByOperation = (itemId, operation) => {
     let value = true;
@@ -158,7 +158,7 @@ export const NewScene = (props) => {
     //         'mint'
     //       )
     //   : [];
-
+    console.log(postConditions);
     doContractCall({
       network: activeNetwork,
       anchorMode: AnchorMode.Any,
@@ -928,7 +928,7 @@ export const NewScene = (props) => {
           </ul>
         </div>
       )}
-      {operation == 'Inventory' && (
+      {(operation == 'Inventory' || operation == 'Shop') && (
         <div className="type-selector-container">
           <ul>
             <li>
