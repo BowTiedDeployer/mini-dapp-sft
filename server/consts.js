@@ -9,18 +9,18 @@ export const coreApiUrl = {
 
 export const privateKey = {
   mainnet: '',
-  testnet: 'c7963ed8a7dd6814215125fb7dcb3c9144f0626feb8749fdd003d6ed04c076c801',
+  testnet: '4d12c55ac1ed830d0ad59df9b50a67b7f77380d59be58b966f7ea9bf34ba4c2901',
   mocknet: '753b7cc01a1a2e86221266a154af739463fce51219d97e4f856cd7200c3bd2a601',
 };
 
 export const adminAddress = {
   mainnet: '',
-  testnet: 'ST3F85199GWWAHQMJQDTSM84V7FVJN74B6EGSM0QS',
+  testnet: 'ST1W7CQ57RKBWXAREEMQS6A4QH4D9R3CNX479H0Y3',
   mocknet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
 };
 
 export const contractAddress = {
   mainnet: '',
-  testnet: 'ST3F85199GWWAHQMJQDTSM84V7FVJN74B6EGSM0QS',
+  testnet: 'ST1W7CQ57RKBWXAREEMQS6A4QH4D9R3CNX479H0Y3',
   mocknet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
 };

@@ -78,23 +78,32 @@ export const MainMenu = () => {
         'burn'
       );
     } else if (operation == 'ClaimStarterKit') {
-      postConditions = getGFTMintPostConds(
-        '15',
-        mainDataDictionary['balances'][1],
-        contractName.resources,
-        '1',
-        'semi-fungible-token-id',
-        'mint'
-      ).concat(
-        getGFTMintPostConds(
-          '100',
-          mainDataDictionary['balances'][2],
-          contractName.resources,
-          '2',
-          'semi-fungible-token-id',
-          'mint'
-        )
-      );
+      postConditions =
+        mainDataDictionary['balances']['1'] > 0
+          ? postConditions.concat(
+              getGFTMintPostConds(
+                '15',
+                mainDataDictionary['balances'][1],
+                contractName.resources,
+                '1',
+                'semi-fungible-token-id',
+                'mint'
+              )
+            )
+          : postConditions;
+      postConditions =
+        mainDataDictionary['balances']['2'] > 0
+          ? postConditions.concat(
+              getGFTMintPostConds(
+                '100',
+                mainDataDictionary['balances'][2],
+                contractName.resources,
+                '2',
+                'semi-fungible-token-id',
+                'mint'
+              )
+            )
+          : postConditions;
     }
     console.log(postConditions);
     let args = [];
