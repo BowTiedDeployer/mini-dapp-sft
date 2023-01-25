@@ -3,6 +3,17 @@ import { useConnect } from '@stacks/connect-react';
 import NavBar from './NavBar';
 import shopBackground from '../resources/shop.png';
 import fightBackground from '../resources/battle.png';
+import monsterImg1 from '../resources/enemies/1.png';
+import monsterImg2 from '../resources/enemies/2.png';
+import monsterImg3 from '../resources/enemies/3.png';
+import monsterImg4 from '../resources/enemies/4.png';
+import monsterImg5 from '../resources/enemies/5.png';
+import monsterImg6 from '../resources/enemies/6.png';
+import monsterImg7 from '../resources/enemies/7.png';
+import monsterImg8 from '../resources/enemies/8.png';
+import monsterImg9 from '../resources/enemies/9.png';
+import monsterImg10 from '../resources/enemies/10.png';
+
 import { baseImgUrl, basePinataUrl } from '../constants/baseImgUrl';
 import { acquisitionList, craftingList, itemTypeDictionary, levelUpList } from '../constants/dataLists';
 import { StacksMainnet, StacksMocknet, StacksTestnet } from '@stacks/network';
@@ -38,6 +49,18 @@ export const NewScene = (props) => {
   const [selectedType, setSelectedType] = useState('sword');
   const [selectedItem, setSelectedItem] = useState(0);
   const craftLikeOperationList = ['Craft', 'LevelUp'];
+  const monsterImages = {
+    1: monsterImg1,
+    2: monsterImg2,
+    3: monsterImg3,
+    4: monsterImg4,
+    5: monsterImg5,
+    6: monsterImg6,
+    7: monsterImg7,
+    8: monsterImg8,
+    9: monsterImg9,
+    10: monsterImg10,
+  };
   // const startFight = () => {
   //   let rewardList = [];
   //   Object.keys(mainDataDictionary['fighting-rewards'][nextFight]).forEach((rewardSet) => {
@@ -665,6 +688,11 @@ export const NewScene = (props) => {
           {enemyStats.defense}
           <br></br>
           <div id="enemyHealth">Health:{enemyStats.health}</div>
+          <br></br>
+          <br></br>
+          <figure>
+            <img className="monsterImg" src={`${monsterImages[10]}`}></img>
+          </figure>
         </div>
         <br></br>
         {/* <button onClick={() => contractCallAction(nextFight)}>Start fight {nextFight}</button> */}

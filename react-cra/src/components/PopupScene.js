@@ -93,10 +93,11 @@ export const PopupScene = (props) => {
   };
 
   const onClickBack = () => {
-    intervals.map((interval) => {
+    intervals.forEach((interval) => {
       clearInterval(interval);
-      intervals = [];
     });
+    intervals = [];
+
     setMenuPage('MainMenu');
   };
 
@@ -156,11 +157,13 @@ export const PopupScene = (props) => {
     // obtaining the operation's start time
 
     let startTime = new Date().getTime();
-    let endTime = addMinutes(startTime, 0.1 /* operationSelectedTime*/); // to replace 0.2 with operationSelectedTime
+    let endTime = addMinutes(startTime, operationSelectedTime /* operationSelectedTime*/); // to replace 0.2 with operationSelectedTime
 
     // setting an interval
 
     let x = setInterval(function () {
+      intervals.push(x);
+
       let now = new Date().getTime();
       let distance = endTime - now;
       let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -206,8 +209,6 @@ export const PopupScene = (props) => {
         }
       }
     }, 1000);
-
-    intervals.push(x);
   };
   const popupSceneMapping = {
     Mine: (
@@ -217,21 +218,8 @@ export const PopupScene = (props) => {
         Mine for {selectedMiningTime} minutes using<br></br>
         {selectedMiningItem &&
           mainDataDictionary['token-name'][selectedMiningItem.toString()].name.replaceAll('_', ' ')}
-        !<br></br> <br></br>
-        <button
-          id="startMine"
-          onClick={
-            () => timer(operation)
-            // () =>
-            // postCall(
-            //   `${serverUrl[network]}/rewarding-mining`,
-            //   userSession.loadUserData().profile.stxAddress['testnet'],
-            //   selectedMiningTime,
-            //   selectedMiningItem
-            // )
-          }
-        >
-          {/* onClick={() => timer(operation)} */}
+        !<br></br>
+        <button id="startMine" onClick={() => timer(operation)}>
           Start mining
         </button>
         <br></br>
@@ -245,7 +233,7 @@ export const PopupScene = (props) => {
         Forest for {selectedHarvestingTime} minutes using<br></br>
         {selectedHarvestingItem &&
           mainDataDictionary['token-name'][selectedHarvestingItem.toString()].name.replaceAll('_', ' ')}
-        ! <br></br>
+        !<br></br>
         <button id="startHarvest" onClick={() => timer(operation)}>
           Start harvesting
         </button>
@@ -256,7 +244,8 @@ export const PopupScene = (props) => {
     ),
     Sleep: (
       <div>
-        {operation} <br></br>
+        {operation}
+        <br></br>
         Sleep for {selectedSleepingTime} minutes!
         <br></br>
         <button id="startSleep" onClick={() => timer(operation)}>
@@ -270,7 +259,11 @@ export const PopupScene = (props) => {
     Explore: (
       <div id="exploreDiv">
         {operation} <br></br>
-        <button id="startExploring" onClick={() => initiateExploring(2, 15)}>
+        <button
+          id="startExploring"
+          disabled={parseInt(mainDataDictionary['balances']['2']) < 15}
+          onClick={() => initiateExploring(2, 15)}
+        >
           Start exploring
         </button>
         <br></br>

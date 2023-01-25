@@ -318,7 +318,9 @@ export const MainMenu = () => {
                 </div>
                 <br></br>
                 <button
+                  id="btnClaimStarterKit"
                   onClick={() => {
+                    document.getElementById('btnClaimStarterKit')?.setAttribute('disabled', 'disabled');
                     contractCallAction('ClaimStarterKit');
                   }}
                 >
@@ -695,7 +697,19 @@ export const MainMenu = () => {
                         selectedHelmet == '' ||
                         selectedShield == '' ||
                         selectedShoes == '' ||
-                        lastFightWon == mainDataDictionary['fighting-status']['next-fight']
+                        lastFightWon == mainDataDictionary['fighting-status']['next-fight'] ||
+                        parseInt(
+                          mainDataDictionary['balances'][
+                            mainDataDictionary['fighting-resources'][
+                              mainDataDictionary['fighting-status']['next-fight']
+                            ]['1']['resource-id'].value
+                          ]
+                        ) <
+                          parseInt(
+                            mainDataDictionary['fighting-resources'][
+                              mainDataDictionary['fighting-status']['next-fight']
+                            ]['1']['resource-qty'].value
+                          )
                       }
                     >
                       Fight

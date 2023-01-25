@@ -1,6 +1,6 @@
 export const contractAddress = {
   mainnet: '',
-  testnet: 'ST1W7CQ57RKBWXAREEMQS6A4QH4D9R3CNX479H0Y3',
+  testnet: 'STCD364PYZG5JGZXH27J5PZDXA7NWY89K9R0849R',
   mocknet: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
 };
 export const contractName = {
@@ -17,4 +17,3 @@ export const functionName = {
   Fight: 'start-fight',
   Explore: 'burn-wrapper',
 };
-
