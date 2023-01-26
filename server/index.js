@@ -1,5 +1,5 @@
-import { StacksMocknet, StacksTestnet, StacksMainnet } from '@stacks/network';
-import {
+const { StacksMocknet, StacksTestnet, StacksMainnet } = require('@stacks/network');
+const {
   stringAsciiCV,
   uintCV,
   tupleCV,
@@ -11,27 +11,17 @@ import {
   NonFungibleConditionCode,
   createAssetInfo,
   makeStandardNonFungiblePostCondition,
-} from '@stacks/transactions';
-import dotenv from 'dotenv';
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import { adminAddress, contractAddress, coreApiUrl, maxStacksTxFee, network, privateKey } from './consts.js';
-import { serializePayload } from '@stacks/transactions/dist/payload.js';
+} = require('@stacks/transactions');
+
+const dotenv = require('dotenv');
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const { adminAddress, contractAddress, coreApiUrl, maxStacksTxFee, network, subdomain } = require('./consts.js');
+const { serializePayload } = require('@stacks/transactions/dist/payload.js');
 
 const networkInstance =
   network == 'mainnet' ? new StacksMainnet() : network == 'testnet' ? new StacksTestnet() : new StacksMocknet();
-
-// address is parsed from client
-// network and private key are selected in env
-// make calls for every function needed
-// timer functions:
-//  sleep
-//  mine
-//  harvest
-// accomplish:
-//  fight-win
-//  explore the woods
 
 dotenv.config();
 
@@ -47,11 +37,11 @@ app.use(
   })
 );
 
-app.get('/', (req, res) => {
+app.get(`/${subdomain}`, (req, res) => {
   res.send('jello');
 });
 
-app.post('/rewarding-mining', async (req, res) => {
+app.post(`/${subdomain}/rewarding-mining`, async (req, res) => {
   try {
     const token_id = req.body.token_id;
     const mininng_time = req.body.time;
@@ -76,7 +66,7 @@ app.post('/rewarding-mining', async (req, res) => {
       contractName: 'main-sc',
       functionName: 'reward-mining',
       functionArgs: args,
-      senderKey: privateKey[network],
+      senderKey: process.env.private_key,
       network: networkInstance,
       // postConditions,
       postConditionMode: PostConditionMode.Allow, // TODO: set Deny
@@ -95,7 +85,7 @@ app.post('/rewarding-mining', async (req, res) => {
   }
 });
 
-app.post('/rewarding-harvesting', async (req, res) => {
+app.post(`/${subdomain}/rewarding-harvesting`, async (req, res) => {
   try {
     const token_id = req.body.token_id;
     const harvesting_time = req.body.time;
@@ -120,7 +110,7 @@ app.post('/rewarding-harvesting', async (req, res) => {
       contractName: 'main-sc',
       functionName: 'reward-harvesting',
       functionArgs: args,
-      senderKey: privateKey[network],
+      senderKey: process.env.private_key,
       network: networkInstance,
       // postConditions,
       postConditionMode: PostConditionMode.Allow, // TODO: set Deny
@@ -139,7 +129,7 @@ app.post('/rewarding-harvesting', async (req, res) => {
   }
 });
 
-app.post('/rewarding-sleeping', async (req, res) => {
+app.post(`/${subdomain}/rewarding-sleeping`, async (req, res) => {
   try {
     const sleeping_time = req.body.time;
     const address = req.body.address;
@@ -165,7 +155,7 @@ app.post('/rewarding-sleeping', async (req, res) => {
       contractName: 'main-sc',
       functionName: 'reward-sleeping',
       functionArgs: args,
-      senderKey: privateKey[network],
+      senderKey: process.env.private_key,
       network: networkInstance,
       // postConditions,
       postConditionMode: PostConditionMode.Allow, // TODO: set Deny
@@ -184,7 +174,7 @@ app.post('/rewarding-sleeping', async (req, res) => {
   }
 });
 
-app.post('/rewarding-fighting', async (req, res) => {
+app.post(`/${subdomain}/rewarding-fighting`, async (req, res) => {
   try {
     const token_id = req.body.token_id;
     // const mininng_time = req.body.time;
@@ -209,7 +199,7 @@ app.post('/rewarding-fighting', async (req, res) => {
       contractName: 'main-sc',
       functionName: 'reward-fighting',
       functionArgs: args,
-      senderKey: privateKey[network],
+      senderKey: process.env.private_key,
       network: networkInstance,
       // postConditions,
       postConditionMode: PostConditionMode.Allow, // TODO: set Deny
@@ -228,7 +218,7 @@ app.post('/rewarding-fighting', async (req, res) => {
   }
 });
 
-app.post('/rewarding-exploring', async (req, res) => {
+app.post(`/${subdomain}/rewarding-exploring`, async (req, res) => {
   try {
     const token_id = req.body.token_id;
     const token_qty = req.body.token_qty;
@@ -253,7 +243,7 @@ app.post('/rewarding-exploring', async (req, res) => {
       contractName: 'main-sc',
       functionName: 'mint-wrapper',
       functionArgs: args,
-      senderKey: privateKey[network],
+      senderKey: process.env.private_key,
       network: networkInstance,
       // postConditions,
       postConditionMode: PostConditionMode.Allow, // TODO: set Deny
