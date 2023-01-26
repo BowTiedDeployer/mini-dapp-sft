@@ -104,6 +104,19 @@ export const MainMenu = () => {
               )
             )
           : postConditions;
+      postConditions =
+        mainDataDictionary['balances']['3'] > 0
+          ? postConditions.concat(
+              getGFTMintPostConds(
+                '100',
+                mainDataDictionary['balances'][2],
+                contractName.resources,
+                '2',
+                'semi-fungible-token-id',
+                'mint'
+              )
+            )
+          : postConditions;
     }
     console.log(postConditions);
     let args = [];
@@ -307,13 +320,19 @@ export const MainMenu = () => {
                 <div className="img-container-new-scene">
                   <figure>
                     <img src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][1]}`}></img>
-                    <figcaption>15</figcaption>
+                    <figcaption>100</figcaption>
                   </figure>
                 </div>
                 <div className="img-container-new-scene">
                   <figure>
                     <img src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][2]}`}></img>
                     <figcaption>100</figcaption>
+                  </figure>
+                </div>
+                <div className="img-container-new-scene">
+                  <figure>
+                    <img src={`https://stacksgamefi.mypinata.cloud/ipfs/${mainDataDictionary['itemsImages'][3]}`}></img>
+                    <figcaption>30</figcaption>
                   </figure>
                 </div>
                 <br></br>

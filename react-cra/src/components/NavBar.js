@@ -3,7 +3,7 @@ import { Button, Form } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+// import NavDropdown from 'react-bootstrap/NavDropdown';
 import ConnectWallet, { userSession } from './ConnectWallet';
 
 function disconnect() {
@@ -38,13 +38,13 @@ export const NavBar = (props) => {
             </button>
           </span>
         </li>
-        <li>
+        {/* <li>
           <span>
             <button id="dropdownBtn" className="nav-btn">
               Dropdown
             </button>
           </span>
-        </li>
+        </li> */}
         <li>
           <span>
             <button id="disconnectBtn" className="nav-btn" onClick={disconnect}>
