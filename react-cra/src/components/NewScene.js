@@ -691,7 +691,7 @@ export const NewScene = (props) => {
           <br></br>
           <br></br>
           <figure>
-            <img className="monsterImg" src={`${monsterImages[10]}`}></img>
+            <img className="monsterImg" src={`${monsterImages[nextFight]}`}></img>
           </figure>
         </div>
         <br></br>
